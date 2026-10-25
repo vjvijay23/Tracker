@@ -175,5 +175,15 @@ Designed and built by a lean 2-person development team:
 
 ---
 
+## 🏃 Outdoor GPS Tracker
+
+The live GPS recorder, pedometer integration, local workout archive, background tracking setup, physical-device checklist and EAS APK instructions are documented in [docs/RUN_TRACKER_SETUP.md](./docs/RUN_TRACKER_SETUP.md).
+
 ## 📄 License
 This project is licensed under the [MIT License](LICENSE).
+
+### Google Maps key for native Android builds
+
+Set the restricted key in the local GOOGLE_MAPS_API_KEY environment variable before running 
+px expo prebuild or a native Gradle build. The dynamic Expo config and Android manifest read this value; keep actual keys in your local environment or EAS secrets, never in Git.
+

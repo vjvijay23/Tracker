@@ -11,6 +11,24 @@
       "resizeMode": "contain",
       "backgroundColor": "#0F172A"
     },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "AVFIT uses your location to record your outdoor workout route.",
+          "locationAlwaysAndWhenInUsePermission": "AVFIT records your route in the background only during an active workout.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
+          "isIosBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "AVFIT counts steps during your workouts."
+        }
+      ]
+    ],
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -21,11 +39,18 @@
         "NSCameraUsageDescription": "AVFIT uses your camera to scan food dishes and calculate accurate nutritional macros.",
         "NSPhotoLibraryUsageDescription": "AVFIT allows you to pick food photos and workout progress photos from your library.",
         "NSMotionUsageDescription": "AVFIT tracks your daily steps and distance in the background.",
-        "NSLocationWhenInUseUsageDescription": "AVFIT tracks your outdoor running, walking, and cycling routes in real time."
+        "NSLocationWhenInUseUsageDescription": "AVFIT tracks your outdoor running, walking, and cycling routes in real time.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "AVFIT continues recording your workout route while the screen is locked, only during an active workout.",
+        "UIBackgroundModes": [
+          "location"
+        ]
       }
     },
     "android": {
       "package": "com.avfit.app",
+      "config": {
+        "googleMaps": {}
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"

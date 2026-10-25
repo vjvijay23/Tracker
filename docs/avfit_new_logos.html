@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVFIT - Brand-New Logo Design Concepts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .brand-glow {
+      filter: drop-shadow(0 8px 24px rgba(36, 74, 50, 0.15));
+    }
+  </style>
+</head>
+<body class="bg-[#F5EFEB] text-[#191C1A] min-h-screen p-4 md:p-8 font-sans antialiased">
+
+  <div class="max-w-5xl mx-auto space-y-8">
+    
+    <!-- Top Header -->
+    <header class="border-b border-[#E2D7C5] pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-[#244A32] flex items-center justify-center text-white font-black text-2xl shadow-sm">
+            ⚡
+          </div>
+          <div>
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-[#191C1A]">
+              AV<span class="text-[#EB7142]">FIT</span> — Brand-New Logo Identities
+            </h1>
+            <p class="text-xs text-[#6B726C]">Original, Professional Logo Designs from Scratch for AVFIT</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#E8F1EC] text-[#244A32] border border-[#C5DDCF]">
+          4 Original Concepts
+        </span>
+      </div>
+    </header>
+
+    <!-- INTRO STATEMENT & RENDER BOARDS -->
+    <section class="bg-white border border-[#E8DFC8] rounded-[28px] p-6 shadow-sm space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-base font-black text-[#191C1A] flex items-center gap-2">
+          <span>🎯</span> Fresh Identity Strategy for "AVFIT"
+        </h2>
+        <span class="text-xs font-bold text-[#244A32] bg-[#E8F1EC] px-3 py-1 rounded-full">4 Original Concepts</span>
+      </div>
+      <p class="text-xs text-[#6B726C] leading-relaxed">
+        Instead of tracing a rough hand drawing, we developed 4 world-class, ground-up brand identities tailored for an <strong>all-in-one fitness community platform</strong> (Activity tracking, AI food vision, home workouts, and social motivation).
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div class="rounded-2xl overflow-hidden border border-[#E8DFC8] shadow-sm">
+          <img src="../assets/avfit_new_concepts_board.jpg" alt="AVFIT 4 Concepts Exploration Sheet" class="w-full object-cover" />
+        </div>
+        <div class="rounded-2xl overflow-hidden border border-[#E8DFC8] shadow-sm">
+          <img src="../assets/avfit_new_app_icons.jpg" alt="AVFIT App Icon Applications" class="w-full object-cover" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CONCEPT SELECTOR TABS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-bold">
+      <button onclick="switchConcept(1)" id="tab-c1" class="concept-tab p-4 rounded-2xl bg-[#244A32] text-white shadow-sm border border-[#244A32] text-left transition">
+        <span class="text-lg block mb-1">♾️</span>
+        <span class="block font-black text-sm">1. Nexus Infinite</span>
+        <span class="text-[10px] block opacity-80 mt-0.5 font-normal">Holistic Fitness Loop</span>
+      </button>
+
+      <button onclick="switchConcept(2)" id="tab-c2" class="concept-tab p-4 rounded-2xl bg-white text-[#191C1A] hover:bg-[#FAF8F4] border border-[#E8DFC8] text-left transition shadow-sm">
+        <span class="text-lg block mb-1">⚡</span>
+        <span class="block font-black text-sm">2. Forward Velocity</span>
+        <span class="text-[10px] block text-[#6B726C] mt-0.5 font-normal">Speed & Performance</span>
+      </button>
+
+      <button onclick="switchConcept(3)" id="tab-c3" class="concept-tab p-4 rounded-2xl bg-white text-[#191C1A] hover:bg-[#FAF8F4] border border-[#E8DFC8] text-left transition shadow-sm">
+        <span class="text-lg block mb-1">💎</span>
+        <span class="block font-black text-sm">3. Monogram Ligature</span>
+        <span class="text-[10px] block text-[#6B726C] mt-0.5 font-normal">Modern Luxury Sport</span>
+      </button>
+
+      <button onclick="switchConcept(4)" id="tab-c4" class="concept-tab p-4 rounded-2xl bg-white text-[#191C1A] hover:bg-[#FAF8F4] border border-[#E8DFC8] text-left transition shadow-sm">
+        <span class="text-lg block mb-1">⛰️</span>
+        <span class="block font-black text-sm">4. Peak Vitality</span>
+        <span class="text-[10px] block text-[#6B726C] mt-0.5 font-normal">Cardio Heart + Peak</span>
+      </button>
+    </section>
+
+    <!-- ACTIVE CONCEPT HERO SHOWCASE -->
+    <section class="bg-white border border-[#E8DFC8] rounded-[32px] p-8 shadow-sm space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+        <div>
+          <span id="concept-badge" class="text-xs font-black text-[#244A32] bg-[#E8F1EC] px-3 py-1 rounded-full uppercase tracking-wider">
+            Concept 1: The Nexus Infinite Loop
+          </span>
+          <h2 id="concept-title" class="text-2xl font-black text-[#191C1A] mt-2 tracking-tight">
+            The Unbroken Continuum of Fitness & Community
+          </h2>
+          <p id="concept-desc" class="text-xs text-[#6B726C] mt-1 max-w-2xl leading-relaxed">
+            Combines an ascending apex ('A') and a grounded cradle ('V') into an infinity loop. Symbolizes the complete health loop: track your steps, scan your nutrition, crush your home workout, and celebrate with the community.
+          </p>
+        </div>
+      </div>
+
+      <!-- Scalable Hero SVG Stage -->
+      <div class="bg-[#FAF8F4] border border-[#E8DFC8] rounded-3xl p-10 flex items-center justify-center min-h-[240px]">
+        <div id="hero-svg-container" class="w-full max-w-[460px] flex justify-center brand-glow">
+          <!-- Dynamically inserted SVG -->
+        </div>
+      </div>
+
+      <!-- Real-World Previews (App Icon, Dark Theme, Watchface) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        
+        <!-- Tile 1: Squircle App Icon -->
+        <div class="bg-[#FAF8F4] border border-[#E8DFC8] rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+          <span class="text-[10px] font-extrabold uppercase text-[#6B726C] tracking-wider mb-3">App Store Launcher</span>
+          <div id="icon-tile" class="w-20 h-20 rounded-[22px] bg-[#F9F6F0] border-2 border-[#E8DFC8] shadow-lg flex items-center justify-center p-2 mb-2">
+            <!-- Icon SVG -->
+          </div>
+          <span class="text-xs font-black text-[#191C1A]">iOS / Android Icon</span>
+        </div>
+
+        <!-- Tile 2: AMOLED Dark Mode Lockup -->
+        <div class="bg-[#161A17] border border-[#2B352E] rounded-2xl p-4 flex flex-col items-center justify-center text-center text-white">
+          <span class="text-[10px] font-extrabold uppercase text-[#A0A8A2] tracking-wider mb-3">Night Run / AMOLED Dark</span>
+          <div id="dark-tile" class="w-full flex items-center justify-center py-2 mb-1">
+            <!-- Dark SVG -->
+          </div>
+          <span class="text-xs font-black text-[#A8D5BA]">Dark Theme Branding</span>
+        </div>
+
+        <!-- Tile 3: Apple Watch / Smartwatch Widget -->
+        <div class="bg-[#FAF8F4] border border-[#E8DFC8] rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+          <span class="text-[10px] font-extrabold uppercase text-[#6B726C] tracking-wider mb-3">Smartwatch Complication</span>
+          <div id="watch-tile" class="w-20 h-20 rounded-full bg-[#161A17] border-2 border-[#244A32] shadow-lg flex items-center justify-center p-3 mb-2">
+            <!-- Watch SVG -->
+          </div>
+          <span class="text-xs font-black text-[#191C1A]">Apple Watch / Garmin</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION: CONCEPT COMPARISON MATRIX -->
+    <section class="bg-white border border-[#E8DFC8] rounded-[28px] p-6 shadow-sm space-y-4">
+      <h3 class="text-base font-black text-[#191C1A]">🔍 Comparative Breakdown of the 4 New Designs</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        
+        <div class="p-4 rounded-2xl bg-[#FAF8F4] border border-[#E8DFC8] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-[#191C1A]">1. The Nexus Infinite</span>
+            <span class="text-[10px] font-bold text-[#244A32] bg-[#E8F1EC] px-2 py-0.5 rounded">Most Balanced</span>
+          </div>
+          <p class="text-[#6B726C] leading-relaxed">
+            Ultra-sleek ribbon loop. Instantly recognizable at tiny favicon sizes and massive billboards alike. Tells the story of an unbroken healthy lifestyle.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#FAF8F4] border border-[#E8DFC8] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-[#191C1A]">2. The Forward Velocity</span>
+            <span class="text-[10px] font-bold text-[#EB7142] bg-[#FDF1EC] px-2 py-0.5 rounded">Most Athletic</span>
+          </div>
+          <p class="text-[#6B726C] leading-relaxed">
+            Dual forward-raking aerodynamic blades. Radiates speed, pace, and forward drive. Perfect for running tracking, leaderboards, and GPS challenges.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#FAF8F4] border border-[#E8DFC8] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-[#191C1A]">3. Monogram Ligature</span>
+            <span class="text-[10px] font-bold text-[#191C1A] bg-[#E8DFC8] px-2 py-0.5 rounded">Most Premium</span>
+          </div>
+          <p class="text-[#6B726C] leading-relaxed">
+            Minimalist typographic mark where 'A' and 'V' fuse into a continuous architectural ribbon with negative space. High-end lifestyle brand aesthetic (like Alo / On Running).
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#FAF8F4] border border-[#E8DFC8] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-[#191C1A]">4. Peak Vitality</span>
+            <span class="text-[10px] font-bold text-[#2A9D8F] bg-[#E8F1EC] px-2 py-0.5 rounded">Most Holistic</span>
+          </div>
+          <p class="text-[#6B726C] leading-relaxed">
+            Harmonizes the two pillars of health: a heart silhouette (cardio, wellness, food nutrition) enclosing a mountain peak (strength, personal endurance).
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const concepts = {
+      1: {
+        badge: "Concept 1: The Nexus Infinite Loop",
+        title: "The Unbroken Continuum of Fitness & Community",
+        desc: "Combines an ascending apex ('A') and a grounded cradle ('V') into an infinity loop. Symbolizes the complete health loop: track your steps, scan your nutrition, crush your home workout, and celebrate with the community.",
+        svgHero: `
+          <svg class="w-full h-32" viewBox="0 0 540 180" fill="none">
+            <!-- Nexus Loop Mark -->
+            <g transform="translate(30, 15)">
+              <path d="M 60 140 C 20 140, 20 85, 55 50 L 105 5 C 115 -3, 125 -3, 135 5 L 185 50 C 220 85, 220 140, 180 140 C 150 140, 130 115, 120 100 C 110 115, 90 140, 60 140 Z" 
+                    stroke="url(#c1Grad)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <!-- A Crossbar Accent -->
+              <path d="M 75 75 L 165 75" stroke="#EB7142" stroke-width="16" stroke-linecap="round"/>
+            </g>
+            <!-- Typographic Wordmark -->
+            <text x="280" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="78" font-weight="900" fill="#244A32" letter-spacing="3">AV</text>
+            <text x="400" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="3">FIT</text>
+            <text x="284" y="136" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800" fill="#6B726C" letter-spacing="7">ALL-IN-ONE FITNESS</text>
+            <defs>
+              <linearGradient id="c1Grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#244A32"/>
+                <stop offset="50%" stop-color="#2E6B47"/>
+                <stop offset="100%" stop-color="#EB7142"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        `,
+        svgIcon: `
+          <svg class="w-14 h-14" viewBox="0 0 240 180" fill="none">
+            <path d="M 60 140 C 20 140, 20 85, 55 50 L 105 5 C 115 -3, 125 -3, 135 5 L 185 50 C 220 85, 220 140, 180 140 C 150 140, 130 115, 120 100 C 110 115, 90 140, 60 140 Z" 
+                  stroke="#244A32" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M 75 75 L 165 75" stroke="#EB7142" stroke-width="18" stroke-linecap="round"/>
+          </svg>
+        `,
+        svgDark: `
+          <svg class="w-48 h-12" viewBox="0 0 540 180" fill="none">
+            <g transform="translate(30, 15)">
+              <path d="M 60 140 C 20 140, 20 85, 55 50 L 105 5 C 115 -3, 125 -3, 135 5 L 185 50 C 220 85, 220 140, 180 140 C 150 140, 130 115, 120 100 C 110 115, 90 140, 60 140 Z" 
+                    stroke="#448B5E" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M 75 75 L 165 75" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+            </g>
+            <text x="280" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#FFFFFF" letter-spacing="3">AV</text>
+            <text x="400" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="3">FIT</text>
+          </svg>
+        `,
+        svgWatch: `
+          <svg class="w-10 h-10" viewBox="0 0 240 180" fill="none">
+            <path d="M 60 140 C 20 140, 20 85, 55 50 L 105 5 L 135 5 L 185 50 C 220 85, 220 140, 180 140 Z" 
+                  stroke="#448B5E" stroke-width="22" stroke-linecap="round" fill="none"/>
+            <path d="M 75 75 L 165 75" stroke="#EB7142" stroke-width="18" stroke-linecap="round"/>
+          </svg>
+        `
+      },
+      2: {
+        badge: "Concept 2: The Forward Velocity Blade",
+        title: "Aerodynamic Speed Blades & Forward Elevation",
+        desc: "Precision athletic speed marks angled at 65 degrees. The upper blade ascends into the peak of 'A', while the lower blade sweeps into 'V', cutting an electric kinetic bolt of energy through negative space.",
+        svgHero: `
+          <svg class="w-full h-32" viewBox="0 0 540 180" fill="none">
+            <!-- Aerodynamic Blades -->
+            <g transform="translate(25, 20)">
+              <!-- Upper Blade (A) -->
+              <path d="M 30 115 L 90 20 L 160 20 L 120 115 Z" fill="#244A32"/>
+              <!-- Lower Inverted Blade (V) -->
+              <path d="M 95 135 L 135 45 L 200 45 L 145 135 Z" fill="#EB7142"/>
+              <!-- Floating Energy Crossbar -->
+              <polygon points="40,82 175,82 165,98 30,98" fill="#161A17"/>
+            </g>
+            <text x="250" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#244A32" letter-spacing="2">AV</text>
+            <text x="370" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="2">FIT</text>
+            <text x="254" y="136" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#6B726C" letter-spacing="7">PERFORMANCE ATHLETICS</text>
+          </svg>
+        `,
+        svgIcon: `
+          <svg class="w-14 h-14" viewBox="0 0 220 160" fill="none">
+            <path d="M 25 115 L 85 20 L 155 20 L 115 115 Z" fill="#244A32"/>
+            <path d="M 90 135 L 130 45 L 195 45 L 140 135 Z" fill="#EB7142"/>
+            <polygon points="35,82 170,82 160,98 25,98" fill="#161A17"/>
+          </svg>
+        `,
+        svgDark: `
+          <svg class="w-48 h-12" viewBox="0 0 540 180" fill="none">
+            <g transform="translate(25, 20)">
+              <path d="M 30 115 L 90 20 L 160 20 L 120 115 Z" fill="#448B5E"/>
+              <path d="M 95 135 L 135 45 L 200 45 L 145 135 Z" fill="#EB7142"/>
+              <polygon points="40,82 175,82 165,98 30,98" fill="#FFFFFF"/>
+            </g>
+            <text x="250" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#FFFFFF" letter-spacing="2">AV</text>
+            <text x="370" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="2">FIT</text>
+          </svg>
+        `,
+        svgWatch: `
+          <svg class="w-10 h-10" viewBox="0 0 220 160" fill="none">
+            <path d="M 25 115 L 85 20 L 155 20 L 115 115 Z" fill="#448B5E"/>
+            <path d="M 90 135 L 130 45 L 195 45 L 140 135 Z" fill="#EB7142"/>
+          </svg>
+        `
+      },
+      3: {
+        badge: "Concept 3: Monogram Ligature",
+        title: "Modern Architectural 'AV' Fusion",
+        desc: "A clean, high-fashion athletic monogram. The letters 'A' and 'V' fuse into a continuous architectural ribbon where the shared diagonal forms an unbroken bridge of strength.",
+        svgHero: `
+          <svg class="w-full h-32" viewBox="0 0 540 180" fill="none">
+            <!-- Modern Monogram Mark -->
+            <g transform="translate(30, 20)">
+              <path d="M 20 130 L 75 15 L 130 130 L 185 15" stroke="url(#c3Grad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M 45 92 L 105 92" stroke="#EB7142" stroke-width="16" stroke-linecap="round"/>
+              <circle cx="185" cy="15" r="9" fill="#EB7142"/>
+            </g>
+            <text x="250" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#244A32" letter-spacing="3">AV</text>
+            <text x="370" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="3">FIT</text>
+            <text x="254" y="136" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#6B726C" letter-spacing="7">ELEVATED TRAINING</text>
+            <defs>
+              <linearGradient id="c3Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#244A32"/>
+                <stop offset="65%" stop-color="#2E6B47"/>
+                <stop offset="100%" stop-color="#EB7142"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        `,
+        svgIcon: `
+          <svg class="w-14 h-14" viewBox="0 0 220 160" fill="none">
+            <path d="M 20 130 L 75 15 L 130 130 L 185 15" stroke="#244A32" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 45 92 L 105 92" stroke="#EB7142" stroke-width="18" stroke-linecap="round"/>
+            <circle cx="185" cy="15" r="9" fill="#EB7142"/>
+          </svg>
+        `,
+        svgDark: `
+          <svg class="w-48 h-12" viewBox="0 0 540 180" fill="none">
+            <g transform="translate(30, 20)">
+              <path d="M 20 130 L 75 15 L 130 130 L 185 15" stroke="#448B5E" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M 45 92 L 105 92" stroke="#EB7142" stroke-width="16" stroke-linecap="round"/>
+            </g>
+            <text x="250" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#FFFFFF" letter-spacing="3">AV</text>
+            <text x="370" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="3">FIT</text>
+          </svg>
+        `,
+        svgWatch: `
+          <svg class="w-10 h-10" viewBox="0 0 220 160" fill="none">
+            <path d="M 20 130 L 75 15 L 130 130 L 185 15" stroke="#FFFFFF" stroke-width="26" stroke-linecap="round"/>
+            <path d="M 45 92 L 105 92" stroke="#EB7142" stroke-width="18" stroke-linecap="round"/>
+          </svg>
+        `
+      },
+      4: {
+        badge: "Concept 4: Peak Vitality Emblem",
+        title: "The Heart of Cardio & Mountain of Strength",
+        desc: "A harmonious synthesis of cardiovascular health and peak physical strength. The outer silhouette forms a heart (cardio, wellness, nutrition), while the inner geometry reveals a mountain apex ('A') and valley ('V').",
+        svgHero: `
+          <svg class="w-full h-32" viewBox="0 0 540 180" fill="none">
+            <!-- Peak Heart Emblem -->
+            <g transform="translate(35, 15)">
+              <!-- Heart Outer Frame -->
+              <path d="M 100 145 C 40 95, 10 50, 45 15 C 75 -10, 100 25, 100 25 C 100 25, 125 -10, 155 15 C 190 50, 160 95, 100 145 Z" 
+                    stroke="url(#c4Grad)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <!-- Mountain Peak (A) Inside -->
+              <path d="M 65 110 L 100 50 L 135 110" stroke="#EB7142" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <text x="260" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#244A32" letter-spacing="2">AV</text>
+            <text x="380" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="2">FIT</text>
+            <text x="264" y="136" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#6B726C" letter-spacing="7">HEART & STRENGTH</text>
+            <defs>
+              <linearGradient id="c4Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#244A32"/>
+                <stop offset="100%" stop-color="#EB7142"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        `,
+        svgIcon: `
+          <svg class="w-14 h-14" viewBox="0 0 200 160" fill="none">
+            <path d="M 100 145 C 40 95, 10 50, 45 15 C 75 -10, 100 25, 100 25 C 100 25, 125 -10, 155 15 C 190 50, 160 95, 100 145 Z" 
+                  stroke="#244A32" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M 65 110 L 100 50 L 135 110" stroke="#EB7142" stroke-width="16" stroke-linecap="round"/>
+          </svg>
+        `,
+        svgDark: `
+          <svg class="w-48 h-12" viewBox="0 0 540 180" fill="none">
+            <g transform="translate(35, 15)">
+              <path d="M 100 145 C 40 95, 10 50, 45 15 C 75 -10, 100 25, 100 25 C 100 25, 125 -10, 155 15 C 190 50, 160 95, 100 145 Z" 
+                    stroke="#448B5E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M 65 110 L 100 50 L 135 110" stroke="#EB7142" stroke-width="14" stroke-linecap="round"/>
+            </g>
+            <text x="260" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#FFFFFF" letter-spacing="2">AV</text>
+            <text x="380" y="105" font-family="system-ui, sans-serif" font-size="78" font-weight="900" fill="#EB7142" letter-spacing="2">FIT</text>
+          </svg>
+        `,
+        svgWatch: `
+          <svg class="w-10 h-10" viewBox="0 0 200 160" fill="none">
+            <path d="M 100 145 C 40 95, 10 50, 45 15 C 75 -10, 100 25, 100 25 C 100 25, 125 -10, 155 15 C 190 50, 160 95, 100 145 Z" 
+                  stroke="#448B5E" stroke-width="20" stroke-linecap="round" fill="none"/>
+            <path d="M 65 110 L 100 50 L 135 110" stroke="#EB7142" stroke-width="16" stroke-linecap="round"/>
+          </svg>
+        `
+      }
+    };
+
+    function switchConcept(id) {
+      document.querySelectorAll('.concept-tab').forEach(tab => {
+        tab.className = 'concept-tab p-4 rounded-2xl bg-white text-[#191C1A] hover:bg-[#FAF8F4] border border-[#E8DFC8] text-left transition shadow-sm';
+      });
+
+      const activeTab = document.getElementById('tab-c' + id);
+      if (activeTab) {
+        activeTab.className = 'concept-tab p-4 rounded-2xl bg-[#244A32] text-white shadow-sm border border-[#244A32] text-left transition';
+      }
+
+      const data = concepts[id];
+      if (data) {
+        document.getElementById('concept-badge').innerText = data.badge;
+        document.getElementById('concept-title').innerText = data.title;
+        document.getElementById('concept-desc').innerText = data.desc;
+        document.getElementById('hero-svg-container').innerHTML = data.svgHero;
+        document.getElementById('icon-tile').innerHTML = data.svgIcon;
+        document.getElementById('dark-tile').innerHTML = data.svgDark;
+        document.getElementById('watch-tile').innerHTML = data.svgWatch;
+      }
+    }
+
+    // Default to Concept 1
+    switchConcept(1);
+  </script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitPulse - Reference UI & Wireframe Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #d7cdbd; border-radius: 4px; }
+    .wireframe-mode {
+      filter: grayscale(100%) contrast(120%) brightness(95%);
+    }
+    .phone-shadow {
+      box-shadow: 0 30px 70px -15px rgba(40, 30, 20, 0.25), 0 0 0 12px #262c28, 0 0 0 14px #3d4640;
+    }
+  </style>
+</head>
+<body class="bg-[#F2ECE1] text-[#191C1A] min-h-screen p-3 md:p-6 font-sans antialiased">
+
+  <div class="max-w-6xl mx-auto">
+    <!-- Top Header & Navigation -->
+    <header class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-[#E2D7C5] gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-[#244A32] text-white flex items-center justify-center font-black text-xl shadow-sm">
+          ⚡
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-black tracking-tight text-[#191C1A] flex items-center gap-2">
+            FitPulse Mobile <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#E8F1EC] text-[#244A32] border border-[#C5DDCF]">Reference Design Applied</span>
+          </h1>
+          <p class="text-xs text-[#6B726C]">Warm Organic Cream • Forest Green • Terracotta Orange • Floating Charcoal Dock</p>
+        </div>
+      </div>
+
+      <!-- Mode Switchers & Actions -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="bg-[#EAE1D3] p-1 rounded-2xl border border-[#DFD4C2] flex items-center gap-1 shadow-inner">
+          <button id="btn-ui-mode" onclick="setViewMode('ui')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#244A32] text-white shadow-sm">
+            🎨 High-Fi UI Mode
+          </button>
+          <button id="btn-wireframe-mode" onclick="setViewMode('wireframe')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition-all">
+            📐 Wireframe Blueprint
+          </button>
+        </div>
+
+        <div class="text-xs text-[#244A32] bg-[#E8F1EC] border border-[#C5DDCF] px-3 py-1.5 rounded-xl flex items-center gap-2 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-[#EB7142] animate-pulse"></span>
+          <span>Click bottom dock tabs to preview screens</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left: Interactive Mobile Mockup (375x780 viewport) -->
+      <div class="lg:col-span-5 flex justify-center">
+        <div id="phone-frame" class="w-[360px] h-[730px] bg-[#F9F6F0] rounded-[44px] phone-shadow flex flex-col overflow-hidden relative border border-[#E8DFC8] transition-all">
+          
+          <!-- Phone Status Bar -->
+          <div class="px-6 pt-3 pb-1 flex justify-between items-center text-[11px] text-[#6B726C] select-none bg-[#F9F6F0] z-20">
+            <span class="font-extrabold text-[#191C1A]">9:41</span>
+            <div class="w-24 h-4 bg-[#191C1A] rounded-full mx-auto"></div>
+            <div class="flex items-center gap-1.5 font-mono text-[10px] text-[#191C1A]">
+              <span>5G</span>
+              <span>100%</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Screen Viewport Container -->
+          <div id="screen-viewport" class="flex-1 overflow-y-auto px-4 py-2 pb-24 space-y-4">
+            
+            <!-- SCREEN 1: HOME & ACTIVE STATS (Screen 1 from Reference) -->
+            <div id="screen-dashboard" class="screen-view space-y-3">
+              <!-- Top Row: Avatar + Calorie Pill + Action Button -->
+              <div class="flex justify-between items-center pt-1">
+                <div class="w-10 h-10 rounded-full bg-[#F3EDE2] border-2 border-white shadow-sm flex items-center justify-center text-lg">
+                  🏃‍♀️
+                </div>
+                <div class="flex items-center gap-1.5 bg-white border border-[#E8DFC8] px-3 py-1 rounded-full shadow-sm">
+                  <div class="w-4 h-4 rounded-full bg-[#244A32] flex items-center justify-center text-[9px] text-white">▲</div>
+                  <span class="text-xs font-extrabold text-[#191C1A]">124 kcal</span>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-[#244A32] font-bold shadow-sm cursor-pointer" onclick="switchTab('scanner')">
+                  ⚡
+                </div>
+              </div>
+
+              <!-- Greeting & Streak Badge -->
+              <div class="flex justify-between items-start pt-1">
+                <div>
+                  <h2 class="text-2xl font-black text-[#191C1A] tracking-tight">Hey, Michelle</h2>
+                  <p class="text-xs text-[#6B726C] mt-0.5">Welcome, 11-week. Keep keep going!</p>
+                </div>
+                <div class="flex items-center gap-1 bg-white border border-[#F3E5D8] px-3 py-1.5 rounded-full shadow-sm text-xs font-black text-[#191C1A]">
+                  <span class="text-[#EB7142]">🔥</span>
+                  <span>11</span>
+                </div>
+              </div>
+
+              <!-- Hero Botanical Runner Graphic Card -->
+              <div class="relative bg-[#F3EDE2] border border-[#E8DFC8] rounded-[28px] h-44 overflow-hidden flex items-center justify-center shadow-inner">
+                <div class="absolute -left-2 top-2 text-3xl opacity-75">🌿</div>
+                <div class="absolute -right-2 bottom-2 text-3xl opacity-75">🍃</div>
+                <div class="text-center z-10">
+                  <div class="w-20 h-20 rounded-full bg-white/70 mx-auto flex items-center justify-center text-4xl shadow-sm mb-1">
+                    🏃‍♀️
+                  </div>
+                  <div class="bg-white/90 px-3 py-1 rounded-full text-[10px] font-extrabold text-[#244A32] shadow-sm">
+                    ⚡ Morning Run Goal 85%
+                  </div>
+                </div>
+              </div>
+
+              <!-- Active Stats Floating Card (Exact Match to Reference Screen 1) -->
+              <div class="bg-[#F7F2EA] border border-[#EAE1D2] rounded-[26px] p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[#244A32] font-black">⚡</span>
+                    <span class="text-sm font-black text-[#191C1A]">Active Stats</span>
+                  </div>
+                  <button onclick="switchTab('activity')" class="w-6 h-6 rounded-full bg-white border border-[#E2D8C6] flex items-center justify-center text-xs font-bold text-[#244A32] hover:bg-[#F3EDE2]">
+                    +
+                  </button>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <!-- Left Metric: 450 kcal -->
+                  <div class="flex-1">
+                    <div class="flex items-baseline gap-1">
+                      <span class="text-3xl font-black text-[#191C1A] tracking-tight">450</span>
+                      <span class="text-xs font-bold text-[#191C1A]">kcal</span>
+                    </div>
+                    <span class="text-xs text-[#6B726C] font-semibold">Duration</span>
+                  </div>
+
+                  <!-- Vertical Line Divider -->
+                  <div class="w-[1px] h-9 bg-[#DFD5C2] mx-4"></div>
+
+                  <!-- Right Metric: 72 min -->
+                  <div class="flex-1">
+                    <div class="flex items-baseline gap-1">
+                      <span class="text-3xl font-black text-[#191C1A] tracking-tight">72</span>
+                      <span class="text-xs font-bold text-[#191C1A]">min</span>
+                    </div>
+                    <span class="text-xs text-[#6B726C] font-semibold">Workouts</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Goals Preview -->
+              <div class="bg-white border border-[#E8DFC8] rounded-2xl p-3 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-[#E8F1EC] flex items-center justify-center text-sm font-bold text-[#244A32]">
+                    🧘‍♀️
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-[#191C1A]">Performing Stretch</h4>
+                    <p class="text-[10px] text-[#6B726C]">20-30 min routine • Mobility</p>
+                  </div>
+                </div>
+                <button onclick="switchTab('workouts')" class="px-3 py-1 bg-[#244A32] text-white text-[11px] font-bold rounded-xl hover:bg-[#1b3826] transition">
+                  Start ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- SCREEN 2: ACTIVITY SUMMARY & WALKING STEPS (Screen 2 from Reference) -->
+            <div id="screen-activity" class="screen-view space-y-3 hidden">
+              <!-- Top Row -->
+              <div class="flex justify-between items-center pt-1">
+                <div class="w-10 h-10 rounded-full bg-[#F3EDE2] border-2 border-white shadow-sm flex items-center justify-center text-lg">
+                  🏃‍♀️
+                </div>
+                <div class="flex items-center gap-1.5 bg-white border border-[#E8DFC8] px-3 py-1 rounded-full shadow-sm">
+                  <div class="w-4 h-4 rounded-full bg-[#244A32] flex items-center justify-center text-[9px] text-white">▲</div>
+                  <span class="text-xs font-extrabold text-[#191C1A]">124 kcal</span>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-[#244A32] font-bold shadow-sm">
+                  ⚡
+                </div>
+              </div>
+
+              <!-- Screen Title -->
+              <h2 class="text-xl font-black text-[#191C1A] tracking-tight">Activity Summary</h2>
+
+              <!-- Walking Steps Card with Bar Graph (Exact Match to Reference Screen 2) -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[26px] p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[#244A32] font-bold">👟</span>
+                    <span class="text-sm font-black text-[#191C1A]">Walking steps</span>
+                  </div>
+                  <span class="text-[11px] font-bold bg-[#F3EDE2] text-[#6B726C] px-3 py-1 rounded-full">Week</span>
+                </div>
+
+                <!-- Vertical Bar Chart -->
+                <div class="flex items-end justify-between h-36 pt-6 px-1">
+                  <!-- Sun -->
+                  <div class="flex flex-col items-center gap-1.5 w-10">
+                    <div class="w-9 bg-[#244A32] rounded-2xl h-20 flex flex-col justify-end items-center pb-1.5">
+                      <span class="text-[7px] text-white/80 font-bold">8,328</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-[#6B726C]">Sun</span>
+                  </div>
+
+                  <!-- Mon -->
+                  <div class="flex flex-col items-center gap-1.5 w-10">
+                    <div class="w-9 bg-[#244A32] rounded-2xl h-28 flex flex-col justify-end items-center pb-1.5">
+                      <span class="text-[7px] text-white/80 font-bold">10,032</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-[#6B726C]">Mon</span>
+                  </div>
+
+                  <!-- Tue -->
+                  <div class="flex flex-col items-center gap-1.5 w-10">
+                    <div class="w-9 bg-[#244A32] rounded-2xl h-20 flex flex-col justify-end items-center pb-1.5">
+                      <span class="text-[7px] text-white/80 font-bold">8,211</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-[#6B726C]">Tue</span>
+                  </div>
+
+                  <!-- Wed (Highlighted with Orange Bar and Tooltip) -->
+                  <div class="flex flex-col items-center gap-1.5 w-10 relative">
+                    <div class="absolute -top-6 bg-[#161A17] text-white px-2 py-0.5 rounded-full text-[9px] font-black flex items-center gap-1 shadow-sm">
+                      <span>👟</span><span>7,427</span>
+                    </div>
+                    <div class="w-9 bg-[#EB7142] border border-[#F9D1BF] rounded-2xl h-24 shadow-sm"></div>
+                    <span class="text-[11px] font-extrabold text-[#191C1A]">Wed</span>
+                  </div>
+
+                  <!-- Thr (Pending) -->
+                  <div class="flex flex-col items-center gap-1.5 w-10">
+                    <div class="w-9 bg-[#F3EDE2] rounded-2xl h-24"></div>
+                    <span class="text-[11px] font-semibold text-[#6B726C]">Thr</span>
+                  </div>
+
+                  <!-- Fri (Pending) -->
+                  <div class="flex flex-col items-center gap-1.5 w-10">
+                    <div class="w-9 bg-[#F3EDE2] rounded-2xl h-24"></div>
+                    <span class="text-[11px] font-semibold text-[#6B726C]">Fri</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Two Mini Cards: Sets & Heart Rate (Exact Match to Reference Screen 2) -->
+              <div class="grid grid-cols-2 gap-3">
+                <!-- Sets Card -->
+                <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-3.5 shadow-sm">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#E8F1EC] flex items-center justify-center text-xs text-[#244A32]">
+                      🏋️
+                    </div>
+                    <span class="text-xs font-extrabold text-[#191C1A]">Sets</span>
+                  </div>
+                  <div class="flex items-baseline gap-0.5">
+                    <span class="text-2xl font-black text-[#191C1A]">7,3</span>
+                    <span class="text-sm font-bold text-[#191C1A]">k</span>
+                  </div>
+                  <span class="text-[10px] text-[#6B726C] block mb-2.5">Duration</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[9px] font-bold bg-[#E8F1EC] text-[#244A32] px-2 py-0.5 rounded-lg border border-[#C5DDCF]">Run</span>
+                    <span class="text-[9px] font-bold bg-[#F3EDE2] text-[#6B726C] px-2 py-0.5 rounded-lg">Gym</span>
+                    <span class="text-[9px] font-bold bg-[#F3EDE2] text-[#6B726C] px-2 py-0.5 rounded-lg">+</span>
+                  </div>
+                </div>
+
+                <!-- Heart Rate Card -->
+                <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-3.5 shadow-sm">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#FDF1EC] flex items-center justify-center text-xs text-[#EB7142]">
+                      ⌚
+                    </div>
+                    <span class="text-xs font-extrabold text-[#191C1A]">Heart rate</span>
+                  </div>
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-2xl font-black text-[#191C1A]">139</span>
+                    <span class="text-[10px] font-bold text-[#6B726C]">bpm</span>
+                  </div>
+                  <span class="text-[10px] text-[#6B726C] block mb-2">Min • 128-162</span>
+                  <div class="bg-[#F7F2EA] px-2 py-1 rounded-lg text-[9px] font-semibold text-[#6B726C] truncate">
+                    ⌚ Apple Watch Synced
+                  </div>
+                </div>
+              </div>
+
+              <!-- Today's Goals (Matching Reference Screen 2) -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-3.5 shadow-sm">
+                <div class="flex justify-between items-center mb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[#244A32] text-sm font-bold">🏆</span>
+                    <span class="text-xs font-black text-[#191C1A]">Today's Goals</span>
+                  </div>
+                  <span class="w-6 h-6 rounded-full bg-[#F3EDE2] flex items-center justify-center text-xs font-bold text-[#244A32]">+</span>
+                </div>
+                <div class="bg-[#FAF8F4] p-2.5 rounded-xl flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8F1EC] flex items-center justify-center text-xs text-[#244A32]">💪</div>
+                    <div>
+                      <span class="text-xs font-extrabold text-[#191C1A] block">Gym Workout</span>
+                      <span class="text-[10px] text-[#6B726C]">Core & HIIT Complete</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-extrabold bg-[#E8F1EC] text-[#244A32] px-2 py-0.5 rounded-md">Complete</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SCREEN 3: HEART HEALTH & RECOVERY (Screen 3 from Reference) -->
+            <div id="screen-workouts" class="screen-view space-y-3 hidden">
+              <!-- Top Row: Back Chevron & Day/Week Pill Toggle -->
+              <div class="flex justify-between items-center pt-1">
+                <button onclick="switchTab('dashboard')" class="w-10 h-10 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-[#191C1A] font-bold shadow-sm">
+                  ❮
+                </button>
+                <div class="bg-[#F3EDE2] p-1 rounded-full flex items-center gap-1">
+                  <button id="toggle-day" onclick="setHealthPeriod('day')" class="px-3.5 py-1 rounded-full text-xs font-bold bg-[#244A32] text-white shadow-sm transition">
+                    Day
+                  </button>
+                  <button id="toggle-week" onclick="setHealthPeriod('week')" class="px-3.5 py-1 rounded-full text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition">
+                    Week
+                  </button>
+                </div>
+              </div>
+
+              <!-- Title -->
+              <h2 class="text-xl font-black text-[#191C1A] tracking-tight">Heart Health</h2>
+
+              <!-- Metric Pills -->
+              <div class="flex items-center gap-2 text-[10px] font-bold">
+                <span class="bg-[#EDE4F2] text-[#6A4B82] px-2.5 py-1 rounded-xl">Stretch: 78%</span>
+                <span class="bg-[#E4EEF2] text-[#3A6878] px-2.5 py-1 rounded-xl">Endurance: 64%</span>
+                <span class="bg-[#F3EDE2] text-[#78603A] px-2.5 py-1 rounded-xl">Stability: 71%</span>
+              </div>
+
+              <!-- Center 3D Botanical Organic Heart Illustration -->
+              <div class="relative py-2 flex items-center justify-between">
+                <button class="w-8 h-8 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-xs text-[#191C1A] shadow-sm">❮</button>
+                <div class="text-center relative">
+                  <div class="text-6xl drop-shadow-md">🫀</div>
+                  <div class="text-xl absolute -bottom-1 left-2">🌿🌸</div>
+                </div>
+                <button class="w-8 h-8 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-xs text-[#191C1A] shadow-sm">❯</button>
+              </div>
+
+              <!-- Sleep Time Card (Exact Match to Reference Screen 3) -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                  <div>
+                    <span class="text-xs font-bold text-[#6B726C] block">Sleep Time</span>
+                    <div class="flex items-baseline gap-1 mt-0.5">
+                      <span class="text-2xl font-black text-[#191C1A]">7<span class="text-base font-bold text-[#6B726C]">h</span>30<span class="text-base font-bold text-[#6B726C]">m</span></span>
+                      <span class="text-xs text-[#6B726C] ml-1">last night</span>
+                    </div>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-[#F7F2EA] flex items-center justify-center text-2xl shadow-inner">
+                    🌙
+                  </div>
+                </div>
+                <!-- 7-Day Checkmarks -->
+                <div class="flex justify-between border-t border-[#F3EDE2] pt-2.5 px-1">
+                  <span class="w-5 h-5 rounded-full bg-[#EB7142] text-white text-[10px] font-bold flex items-center justify-center">✓</span>
+                  <span class="w-5 h-5 rounded-full bg-[#EB7142] text-white text-[10px] font-bold flex items-center justify-center">✓</span>
+                  <span class="w-5 h-5 rounded-full bg-[#EB7142] text-white text-[10px] font-bold flex items-center justify-center">✓</span>
+                  <span class="w-5 h-5 rounded-full bg-[#EB7142] text-white text-[10px] font-bold flex items-center justify-center">✓</span>
+                  <span class="w-5 h-5 rounded-full bg-[#EAE1D3]"></span>
+                  <span class="w-5 h-5 rounded-full bg-[#EAE1D3]"></span>
+                  <span class="w-5 h-5 rounded-full bg-[#EAE1D3]"></span>
+                </div>
+              </div>
+
+              <!-- Performing Stretch Routine with Play Button (Exact Match to Reference Screen 3) -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-3.5 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-[#F3EDE2] flex items-center justify-center text-2xl">
+                    🧘‍♀️
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-black text-[#191C1A]">Performing stretch</h4>
+                    <p class="text-[10px] text-[#6B726C] mt-0.5">Hold stretch for 20-30 minutes per day</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span id="stretch-timer-display" class="text-xs font-mono font-extrabold text-[#244A32]">00:30</span>
+                      <button onclick="resetStretchTimer()" class="text-[10px] text-[#6B726C] hover:text-[#191C1A]">↺ Reset</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Green Circular Play Button -->
+                <button id="btn-stretch-play" onclick="toggleStretchTimer()" class="w-11 h-11 rounded-full bg-[#E8F1EC] border-2 border-[#244A32] flex items-center justify-center text-[#244A32] text-sm font-bold shadow-sm hover:scale-105 transition">
+                  ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- SCREEN 4: AI FOOD VISION (Harmonized to Reference) -->
+            <div id="screen-scanner" class="screen-view space-y-3 hidden">
+              <div class="flex justify-between items-center pt-1">
+                <h2 class="text-xl font-black text-[#191C1A] tracking-tight">AI Food Vision</h2>
+                <span class="text-xs font-bold bg-[#E8F1EC] text-[#244A32] px-2.5 py-0.5 rounded-full border border-[#C5DDCF]">Gemini 1.5</span>
+              </div>
+
+              <!-- Viewfinder Box -->
+              <div class="relative h-40 rounded-[24px] bg-[#F3EDE2] border-2 border-dashed border-[#244A32]/40 flex flex-col items-center justify-center overflow-hidden">
+                <div class="text-center z-10 p-2">
+                  <div class="w-10 h-10 rounded-full bg-white text-[#244A32] flex items-center justify-center mx-auto mb-2 text-lg shadow-sm">📷</div>
+                  <p class="text-xs font-extrabold text-[#191C1A]">Salmon Quinoa Bowl Detected</p>
+                  <p class="text-[10px] text-[#244A32] font-mono font-bold">94% AI Confidence</p>
+                  <button onclick="simulateScan()" class="mt-2 px-3 py-1 bg-[#244A32] text-white text-[11px] font-bold rounded-lg hover:bg-[#1b3826] transition shadow-sm">
+                    Re-Scan Plate ⚡
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Results Card -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-4 space-y-3 shadow-sm">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="text-sm font-black text-[#191C1A]">Grilled Salmon & Quinoa Bowl</h3>
+                    <p class="text-[10px] text-[#244A32] font-semibold">✓ Heart Healthy Omega-3 & Complex Carbs</p>
+                  </div>
+                </div>
+
+                <!-- Portion Stepper -->
+                <div class="bg-[#FAF8F4] p-2.5 rounded-xl border border-[#E8DFC8] flex items-center justify-between">
+                  <span class="text-xs text-[#191C1A] font-bold">Serving Weight:</span>
+                  <div class="flex items-center gap-3">
+                    <button onclick="adjustServing(-25)" class="w-6 h-6 rounded bg-white text-[#191C1A] font-bold text-xs flex items-center justify-center shadow-sm">-</button>
+                    <span id="food-weight-display" class="text-xs font-extrabold text-[#244A32]">350g</span>
+                    <button onclick="adjustServing(25)" class="w-6 h-6 rounded bg-white text-[#191C1A] font-bold text-xs flex items-center justify-center shadow-sm">+</button>
+                  </div>
+                </div>
+
+                <!-- Macro Grid -->
+                <div class="grid grid-cols-4 gap-1.5 text-center">
+                  <div class="bg-[#FAF8F4] p-2 rounded-xl border border-[#E8DFC8]">
+                    <span id="food-cal-display" class="text-xs font-black text-[#191C1A] block">540</span>
+                    <span class="text-[9px] text-[#6B726C]">Calories</span>
+                  </div>
+                  <div class="bg-[#FAF8F4] p-2 rounded-xl border border-[#E8DFC8]">
+                    <span id="food-protein-display" class="text-xs font-black text-[#244A32] block">44g</span>
+                    <span class="text-[9px] text-[#6B726C]">Protein</span>
+                  </div>
+                  <div class="bg-[#FAF8F4] p-2 rounded-xl border border-[#E8DFC8]">
+                    <span id="food-carbs-display" class="text-xs font-black text-[#EB7142] block">46g</span>
+                    <span class="text-[9px] text-[#6B726C]">Carbs</span>
+                  </div>
+                  <div class="bg-[#FAF8F4] p-2 rounded-xl border border-[#E8DFC8]">
+                    <span id="food-fat-display" class="text-xs font-black text-[#A05A32] block">16g</span>
+                    <span class="text-[9px] text-[#6B726C]">Fat</span>
+                  </div>
+                </div>
+
+                <button onclick="alert('Meal logged to daily food diary!')" class="w-full py-2.5 bg-[#244A32] hover:bg-[#1b3826] text-white font-extrabold text-xs rounded-xl transition shadow">
+                  Log to Diary: Lunch (540 kcal)
+                </button>
+              </div>
+            </div>
+
+            <!-- SCREEN 5: COMMUNITY FEED (Harmonized to Reference) -->
+            <div id="screen-community" class="screen-view space-y-3 hidden">
+              <div class="flex justify-between items-center pt-1">
+                <h2 class="text-xl font-black text-[#191C1A] tracking-tight">Community Feed</h2>
+                <button onclick="alert('Post Modal')" class="text-xs font-bold bg-[#244A32] text-white px-3 py-1 rounded-full shadow-sm">
+                  + Share
+                </button>
+              </div>
+
+              <!-- Community Post -->
+              <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-3.5 space-y-2 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-[#F3EDE2] flex items-center justify-center text-sm font-bold">ML</div>
+                    <div>
+                      <span class="text-xs font-bold text-[#191C1A] block">Maya Lin</span>
+                      <span class="text-[10px] text-[#6B726C]">2h ago • Level 4</span>
+                    </div>
+                  </div>
+                  <span class="text-[9px] font-bold text-[#244A32] bg-[#E8F1EC] px-2 py-0.5 rounded">Stretch Done</span>
+                </div>
+                <p class="text-xs text-[#191C1A] leading-relaxed">
+                  Completed the 30-min mobility stretch routine! Heart rate stayed at a steady 94 bpm. Feeling grounded and rejuvenated 🌿✨
+                </p>
+                <div class="flex justify-between items-center border-t border-[#F3EDE2] pt-2 text-xs text-[#6B726C]">
+                  <button onclick="toggleLike(this)" class="hover:text-[#EB7142] transition flex items-center gap-1">
+                    <span>👏</span> <span class="like-count">24</span> High-Fives
+                  </button>
+                  <span>💬 6 Comments</span>
+                  <span>🔗 Share</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Floating Bottom Dark Charcoal Navigation Dock (Exact Match to Reference Image) -->
+          <div class="absolute bottom-4 left-5 right-5 h-16 bg-[#161A17] rounded-[36px] px-3 flex justify-around items-center z-30 shadow-2xl">
+            <!-- Tab 1: Home -->
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="dock-tab w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#244A32] shadow-sm transition">
+              <span class="text-base font-bold">🏠</span>
+            </button>
+            <!-- Tab 2: Activity Steps -->
+            <button onclick="switchTab('activity')" id="nav-activity" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+              <span class="text-base">👟</span>
+            </button>
+            <!-- Tab 3: Workouts -->
+            <button onclick="switchTab('workouts')" id="nav-workouts" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+              <span class="text-base">🫀</span>
+            </button>
+            <!-- Tab 4: AI Food -->
+            <button onclick="switchTab('scanner')" id="nav-scanner" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+              <span class="text-base">📸</span>
+            </button>
+            <!-- Tab 5: Community -->
+            <button onclick="switchTab('community')" id="nav-community" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+              <span class="text-base">👥</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Specification & Design Reference Breakdown -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- Info Card: Reference Design Analysis -->
+        <div class="bg-white border border-[#E8DFC8] rounded-[28px] p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span id="spec-pill" class="text-xs font-bold px-3 py-1 rounded-full bg-[#E8F1EC] text-[#244A32] border border-[#C5DDCF]">
+              Screen 1: Home & Active Stats
+            </span>
+            <span class="text-xs font-mono text-[#6B726C]">React Native • Expo</span>
+          </div>
+
+          <h2 id="spec-title" class="text-xl font-extrabold text-[#191C1A] mb-2">
+            Warm Organic Fitness Aesthetic with Floating Dock
+          </h2>
+          <p id="spec-desc" class="text-sm text-[#6B726C] leading-relaxed mb-4">
+            Directly replicates the reference layout: warm cream background, avatar with calorie burn pill, floating streak badge, hero runner graphic, and the two-column Active Stats card (450 kcal / 72 min).
+          </p>
+
+          <!-- Design Comparison Highlights -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-4">
+            <div class="bg-[#FAF8F4] p-3 rounded-2xl border border-[#E8DFC8]">
+              <span class="text-[#244A32] font-black block mb-1">🌿 Organic Botanical Palette</span>
+              <span class="text-[#6B726C]">Warm Cream (<code class="text-[#244A32]">#F9F6F0</code>), Forest Green (<code class="text-[#244A32]">#244A32</code>), and Terracotta (<code class="text-[#EB7142]">#EB7142</code>).</span>
+            </div>
+            <div class="bg-[#FAF8F4] p-3 rounded-2xl border border-[#E8DFC8]">
+              <span class="text-[#161A17] font-black block mb-1">📱 Floating Charcoal Dock</span>
+              <span class="text-[#6B726C]">Dark pill navbar floating 16px above bottom with white circular active tab indicator.</span>
+            </div>
+            <div class="bg-[#FAF8F4] p-3 rounded-2xl border border-[#E8DFC8]">
+              <span class="text-[#EB7142] font-black block mb-1">📊 Walking Steps Chart</span>
+              <span class="text-[#6B726C]">Forest green daily bars with highlighted orange Wednesday bar and floating 7,427 pill.</span>
+            </div>
+            <div class="bg-[#FAF8F4] p-3 rounded-2xl border border-[#E8DFC8]">
+              <span class="text-[#244A32] font-black block mb-1">🫀 Recovery & Stretch Coach</span>
+              <span class="text-[#6B726C]">Sleep Time 7h30m card and performing stretch card with interactive audio-guided timer.</span>
+            </div>
+          </div>
+
+          <!-- Quick Jump Screen Selector -->
+          <div class="border-t border-[#F3EDE2] pt-4">
+            <div class="text-xs text-[#6B726C] mb-2 font-bold uppercase tracking-wider">Preview Screens from Reference:</div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="switchTab('dashboard')" class="text-xs bg-[#F3EDE2] hover:bg-[#E8DFC8] text-[#191C1A] font-bold px-3 py-1.5 rounded-xl transition">
+                1. Home & Active Stats
+              </button>
+              <button onclick="switchTab('activity')" class="text-xs bg-[#F3EDE2] hover:bg-[#E8DFC8] text-[#191C1A] font-bold px-3 py-1.5 rounded-xl transition">
+                2. Walking Steps & Sets
+              </button>
+              <button onclick="switchTab('workouts')" class="text-xs bg-[#F3EDE2] hover:bg-[#E8DFC8] text-[#191C1A] font-bold px-3 py-1.5 rounded-xl transition">
+                3. Heart Health & Stretch
+              </button>
+              <button onclick="switchTab('scanner')" class="text-xs bg-[#F3EDE2] hover:bg-[#E8DFC8] text-[#191C1A] font-bold px-3 py-1.5 rounded-xl transition">
+                4. AI Food Scanner
+              </button>
+              <button onclick="switchTab('community')" class="text-xs bg-[#F3EDE2] hover:bg-[#E8DFC8] text-[#191C1A] font-bold px-3 py-1.5 rounded-xl transition">
+                5. Community Feed
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Android Quick Start Guide -->
+        <div class="bg-white border border-[#E8DFC8] rounded-[28px] p-5 text-xs text-[#6B726C] space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="font-extrabold text-[#191C1A] text-sm">📲 Testing This App on Android with Expo Go</h3>
+            <span class="text-[#244A32] font-bold">React Native Mobile</span>
+          </div>
+          <p>
+            The entire source code in your directory is structured with this exact design system. Run it immediately:
+          </p>
+          <div class="bg-[#161A17] p-3 rounded-2xl font-mono text-[11px] text-[#A8D5BA] space-y-1">
+            <div class="text-[#6F7771]"># Install dependencies</div>
+            <div class="text-white">npm install</div>
+            <div class="text-[#6F7771]"># Start Expo development server</div>
+            <div class="text-white">npx expo start</div>
+            <div class="text-[#E07A5F]"># Scan QR code in terminal using Expo Go app on Android</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screens = {
+      dashboard: {
+        title: 'Warm Organic Fitness Aesthetic with Floating Dock',
+        pill: 'Screen 1: Home & Active Stats',
+        desc: 'Directly replicates the reference layout: warm cream background, avatar with calorie burn pill, floating streak badge, hero runner graphic, and the two-column Active Stats card (450 kcal / 72 min).'
+      },
+      activity: {
+        title: 'Walking Steps Bar Chart & Metric Sets',
+        pill: 'Screen 2: Activity Summary',
+        desc: 'Features the exact walking steps bar chart from the reference: Sun (8,328), Mon (10,032), Tue (8,211), and Wed highlighted with an orange bar and 7,427 tooltip pill, plus the Sets (7,3k) and Heart Rate (139 bpm) cards.'
+      },
+      workouts: {
+        title: 'Heart Health & Performing Stretch Player',
+        pill: 'Screen 3: Heart Health & Recovery',
+        desc: 'Replicates the 3D botanical heart artwork, Day/Week pill toggle, metric tags (Stretch: 78%, Endurance: 64%), Sleep Time (7h30m) card, and Performing stretch routine with live play button and timer.'
+      },
+      scanner: {
+        title: 'AI Food Vision & Macro Calculator',
+        pill: 'Screen 4: AI Food Scanner',
+        desc: 'Adapted to the reference aesthetic: warm cream camera viewfinder, Gemini 1.5 multimodal dish identification, serving weight stepper, and macro breakdown.'
+      },
+      community: {
+        title: 'Social Fitness Community & High-Fives',
+        pill: 'Screen 5: Fitness Community',
+        desc: 'Community posts styled with soft cream cards, high-five counters, recovery achievement tags, and member challenge banners.'
+      }
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.dock-tab').forEach(el => {
+        el.className = 'dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition';
+      });
+
+      const activeScreen = document.getElementById('screen-' + tabId);
+      if (activeScreen) activeScreen.classList.remove('hidden');
+
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) {
+        activeNav.className = 'dock-tab w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#244A32] shadow-sm transition';
+      }
+
+      if (screens[tabId]) {
+        document.getElementById('spec-title').innerText = screens[tabId].title;
+        document.getElementById('spec-pill').innerText = screens[tabId].pill;
+        document.getElementById('spec-desc').innerText = screens[tabId].desc;
+      }
+    }
+
+    function setViewMode(mode) {
+      const phone = document.getElementById('phone-frame');
+      const btnUi = document.getElementById('btn-ui-mode');
+      const btnWf = document.getElementById('btn-wireframe-mode');
+
+      if (mode === 'wireframe') {
+        phone.classList.add('wireframe-mode');
+        btnWf.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#244A32] text-white shadow-sm';
+        btnUi.className = 'px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition-all';
+      } else {
+        phone.classList.remove('wireframe-mode');
+        btnUi.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#244A32] text-white shadow-sm';
+        btnWf.className = 'px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition-all';
+      }
+    }
+
+    // Stretch Timer Logic
+    let stretchRunning = false;
+    let stretchSec = 30;
+    let stretchInterval = null;
+
+    function toggleStretchTimer() {
+      const btn = document.getElementById('btn-stretch-play');
+      if (stretchRunning) {
+        clearInterval(stretchInterval);
+        stretchRunning = false;
+        btn.innerText = '▶';
+      } else {
+        stretchRunning = true;
+        btn.innerText = '⏸';
+        stretchInterval = setInterval(() => {
+          if (stretchSec > 0) {
+            stretchSec--;
+            document.getElementById('stretch-timer-display').innerText = '00:' + (stretchSec < 10 ? '0' + stretchSec : stretchSec);
+          } else {
+            clearInterval(stretchInterval);
+            stretchRunning = false;
+            btn.innerText = '✓';
+          }
+        }, 1000);
+      }
+    }
+
+    function resetStretchTimer() {
+      clearInterval(stretchInterval);
+      stretchRunning = false;
+      stretchSec = 30;
+      document.getElementById('stretch-timer-display').innerText = '00:30';
+      document.getElementById('btn-stretch-play').innerText = '▶';
+    }
+
+    // Portion Adjuster
+    let baseWeight = 350;
+    function adjustServing(delta) {
+      baseWeight = Math.max(50, baseWeight + delta);
+      const ratio = baseWeight / 350;
+      document.getElementById('food-weight-display').innerText = baseWeight + 'g';
+      document.getElementById('food-cal-display').innerText = Math.round(540 * ratio);
+      document.getElementById('food-protein-display').innerText = (44 * ratio).toFixed(1) + 'g';
+      document.getElementById('food-carbs-display').innerText = (46 * ratio).toFixed(1) + 'g';
+      document.getElementById('food-fat-display').innerText = (16 * ratio).toFixed(1) + 'g';
+    }
+
+    function setHealthPeriod(period) {
+      const dayBtn = document.getElementById('toggle-day');
+      const weekBtn = document.getElementById('toggle-week');
+      if (period === 'day') {
+        dayBtn.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#244A32] text-white shadow-sm transition';
+        weekBtn.className = 'px-3.5 py-1 rounded-full text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition';
+      } else {
+        weekBtn.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#244A32] text-white shadow-sm transition';
+        dayBtn.className = 'px-3.5 py-1 rounded-full text-xs font-medium text-[#6B726C] hover:text-[#191C1A] transition';
+      }
+    }
+
+    function toggleLike(btn) {
+      const span = btn.querySelector('.like-count');
+      let count = parseInt(span.innerText, 10);
+      if (btn.classList.contains('text-[#EB7142]')) {
+        btn.classList.remove('text-[#EB7142]', 'font-bold');
+        span.innerText = count - 1;
+      } else {
+        btn.classList.add('text-[#EB7142]', 'font-bold');
+        span.innerText = count + 1;
+      }
+    }
+  </script>
+</body>
+</html>
