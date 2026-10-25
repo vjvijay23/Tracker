@@ -1,0 +1,27 @@
+name: Feature Request
+description: Propose a new feature or idea for FitPulse
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Share your ideas for new fitness features, community challenges, or UI improvements!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Use Case
+      description: What user problem does this feature solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you envision this feature working inside the mobile app.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you've considered?

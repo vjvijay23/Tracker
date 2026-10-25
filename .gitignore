@@ -1,0 +1,37 @@
+# Node & Expo
+node_modules/
+.expo/
+dist/
+web-build/
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Native build outputs
+android/.gradle/
+android/app/build/
+android/build/
+ios/build/
+ios/Pods/
+*.orig.*
+
+# Environment variables & secrets
+.env
+.env.local
+.env.production
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary & Log files
+*.log

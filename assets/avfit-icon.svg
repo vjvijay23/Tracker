@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F9F6F0" />
+      <stop offset="100%" stop-color="#EFE6D8" />
+    </linearGradient>
+    <linearGradient id="iconStroke" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#244A32" />
+      <stop offset="50%" stop-color="#2E6B47" />
+      <stop offset="100%" stop-color="#EB7142" />
+    </linearGradient>
+    <filter id="iconShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#244A32" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Squircle App Icon Base -->
+  <rect width="512" height="512" rx="128" fill="url(#iconBg)" stroke="#E8DFC8" stroke-width="6" />
+
+  <!-- The AV Pulse Waveform Symbol -->
+  <g transform="translate(68, 64)" filter="url(#iconShadow)">
+    <!-- Base Wave: Ascends into A, drops into V, rockets upward -->
+    <path
+      d="M 25 260 
+         L 85 210 
+         L 165 45 
+         L 245 275 
+         L 345 35"
+      stroke="url(#iconStroke)"
+      stroke-width="32"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    
+    <!-- Dynamic A Crossbar -->
+    <path
+      d="M 70 185 L 275 185"
+      stroke="url(#iconStroke)"
+      stroke-width="26"
+      stroke-linecap="round"
+    />
+
+    <!-- Apex Energy Spark -->
+    <circle cx="345" cy="35" r="16" fill="#EB7142" />
+  </g>
+
+  <!-- Subtle 'AVFIT' Bottom Micro Brandmark -->
+  <text
+    x="256"
+    y="450"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif"
+    font-size="36"
+    font-weight="900"
+    letter-spacing="10"
+    fill="#244A32"
+  >AVFIT</text>
+</svg>

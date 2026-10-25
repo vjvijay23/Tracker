@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AVFIT - Mobile Device Emulator (Live Activity Tracking & User Isolation)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Mobile scrollbar */
+    ::-webkit-scrollbar { width: 0px; height: 0px; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #F9F6F0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .animate-pop {
+      animation: pop 0.25s ease-out forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="flex flex-col h-full bg-[#F9F6F0] text-[#191C1A]">
+
+  <!-- Mobile Status Bar -->
+  <div class="px-6 pt-3 pb-1 flex justify-between items-center text-[12px] font-bold text-[#191C1A] select-none bg-[#F9F6F0] z-30 shrink-0">
+    <span>9:41</span>
+    <!-- Dynamic Island / Speaker Pill -->
+    <div class="w-24 h-4 bg-[#161A17] rounded-full mx-auto"></div>
+    <div class="flex items-center gap-1.5 font-mono text-[11px]">
+      <span>5G</span>
+      <span class="w-5 h-2.5 border border-[#191C1A] rounded-sm p-[1px] flex items-center">
+        <span class="bg-[#191C1A] w-full h-full rounded-[1px]"></span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Account Switcher Bar (Test User Isolation & Zero State) -->
+  <div class="px-3 py-1.5 bg-[#EAE2D5] flex items-center justify-between text-[11px] font-bold z-30 shrink-0 border-b border-[#E0D5C3]">
+    <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+      <span class="text-[10px] text-[#6B726C] font-black uppercase mr-1">User:</span>
+      <button onclick="switchUserAccount('alex')" id="btn-user-alex" class="px-2 py-0.5 rounded-full bg-[#244A32] text-white shadow-xs">
+        Alex Vance (Existing)
+      </button>
+      <button onclick="switchUserAccount('new_user')" id="btn-user-new" class="px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs">
+        ✨ New User (Starts at 0)
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Screen Nav Pills -->
+  <div class="px-3 py-1 bg-[#F3EDE2] flex items-center justify-between text-[10.5px] font-bold z-30 shrink-0 border-b border-[#E8DFC8]">
+    <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+      <button onclick="switchTab('dashboard')" id="pill-dashboard" class="nav-pill px-2 py-0.5 rounded-full bg-[#244A32] text-white shadow-xs">Dashboard</button>
+      <button onclick="switchTab('record')" id="pill-record" class="nav-pill px-2 py-0.5 rounded-full bg-[#EB7142] text-white shadow-xs">⏺ Record</button>
+      <button onclick="switchTab('achievements')" id="pill-achievements" class="nav-pill px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs">🏆 Trophies</button>
+      <button onclick="switchTab('welcome')" id="pill-welcome" class="nav-pill px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs">Auth</button>
+      <button onclick="switchTab('onboarding')" id="pill-onboarding" class="nav-pill px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs">Onboard</button>
+    </div>
+    <span id="active-user-tag" class="text-[9.5px] font-mono text-[#244A32] shrink-0 font-bold ml-1">Alex (14d)</span>
+  </div>
+
+  <!-- Scrollable Screen Content Viewport -->
+  <main id="mobile-viewport" class="flex-1 overflow-y-auto px-4 py-2 pb-24 space-y-4">
+
+    <!-- ==================== SCREEN 1: DASHBOARD ==================== -->
+    <div id="screen-dashboard" class="screen-view space-y-3.5 pt-1">
+      <!-- Top Row with AVFIT Brand Logo Lockup -->
+      <div class="flex justify-between items-center pt-1">
+        <div id="dash-avatar-circle" class="w-11 h-11 rounded-full bg-[#F3EDE2] border-2 border-white shadow-sm flex items-center justify-center text-xl cursor-pointer" onclick="switchTab('onboarding')">
+          🏃‍♂️
+        </div>
+        <!-- Official AVFIT Logo in Header -->
+        <div class="flex items-center gap-2 bg-white border border-[#E8DFC8] px-3.5 py-1.5 rounded-full shadow-sm">
+          <img src="../assets/avfit_official_logo.png" alt="AVFIT Logo" class="w-6 h-6 rounded-[7px] object-cover shadow-sm" />
+          <span class="text-xs font-black tracking-wider text-[#191C1A]">AV<span class="text-[#00A6FF]">FIT</span></span>
+        </div>
+        <div class="w-11 h-11 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-[#EB7142] font-black shadow-sm cursor-pointer hover:bg-[#F3EDE2]" onclick="switchTab('achievements')">
+          🏆
+        </div>
+      </div>
+
+      <!-- Greeting & Streak (Zero state for new users) -->
+      <div class="flex justify-between items-start pt-1">
+        <div>
+          <h1 id="dash-greeting-title" class="text-2xl font-black text-[#191C1A] tracking-tight">Hey, Alex</h1>
+          <p id="dash-greeting-sub" class="text-xs text-[#6B726C] mt-0.5">Day 14 • Goal: Weight Loss & Lean Tone</p>
+        </div>
+        <div class="flex items-center gap-1.5 bg-white border border-[#F3E5D8] px-3.5 py-1.5 rounded-full shadow-sm text-xs font-black text-[#191C1A]">
+          <span class="text-[#EB7142]">🔥</span>
+          <span id="dash-streak-days">14 Days</span>
+        </div>
+      </div>
+
+      <!-- Hero Artwork Card -->
+      <div class="relative bg-[#F3ECE0] border border-[#E8DFC8] rounded-[28px] h-36 overflow-hidden flex items-center justify-center shadow-inner">
+        <div class="absolute -left-2 top-2 text-3xl opacity-80">🌿</div>
+        <div class="absolute -right-2 bottom-2 text-3xl opacity-80">🍃</div>
+        <div class="text-center z-10">
+          <div id="dash-hero-avatar" class="w-14 h-14 rounded-full bg-white/80 mx-auto flex items-center justify-center text-3xl shadow-sm mb-1">
+            🧘‍♂️
+          </div>
+          <div id="dash-hero-status" class="bg-white/95 px-3 py-1 rounded-full text-[10px] font-black text-[#244A32] shadow-sm">
+            ⚡ 12 Sessions Completed
+          </div>
+        </div>
+      </div>
+
+      <!-- User-Isolated Cumulative Metrics Card -->
+      <div class="bg-white border border-[#EAE1D2] rounded-[24px] p-4 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#244A32] font-black">⚡</span>
+            <span class="text-xs font-black tracking-wider uppercase text-[#6B726C]">Recorded Statistics</span>
+          </div>
+          <button onclick="switchTab('record')" class="text-[11px] font-black text-white bg-[#EB7142] px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1">
+            <span>⏺</span> Record
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="p-2 bg-[#FAFAF8] rounded-xl border border-[#F0EAE0]">
+            <span id="dash-cals-burned" class="block text-2xl font-black text-[#191C1A]">450</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">KCAL BURNED</span>
+          </div>
+          <div class="p-2 bg-[#FAFAF8] rounded-xl border border-[#F0EAE0]">
+            <span id="dash-distance-km" class="block text-2xl font-black text-[#191C1A]">42.5</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">TOTAL KM</span>
+          </div>
+          <div class="p-2 bg-[#FAFAF8] rounded-xl border border-[#F0EAE0]">
+            <span id="dash-acts-count" class="block text-2xl font-black text-[#191C1A]">12</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">ACTIVITIES</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gamified Trophy Room Card (Isolated per user) -->
+      <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-4 shadow-sm cursor-pointer hover:bg-[#FAF8F4] transition" onclick="switchTab('achievements')">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-[#E8F1EC] flex items-center justify-center text-xl shrink-0">
+            🏆
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-black text-[#191C1A]">Trophy Room & Badges</h3>
+              <span id="dash-trophy-pts" class="bg-[#F3EDE2] text-[#244A32] text-[10px] font-black px-2 py-0.5 rounded-md">850 pts</span>
+            </div>
+            <p id="dash-trophy-count" class="text-xs text-[#6B726C] mt-0.5">7 of 23 Milestones Unlocked</p>
+          </div>
+          <span class="text-[#6B726C] text-sm">›</span>
+        </div>
+        <!-- Next Milestone Mini Bar -->
+        <div class="mt-3 pt-2.5 border-t border-[#F0EAE0] flex items-center gap-2">
+          <span class="text-[11px] text-[#6B726C] shrink-0">Next: <strong id="dash-next-trophy-name" class="text-[#191C1A]">10K Titan</strong></span>
+          <div class="flex-1 h-1.5 bg-[#EAE2D5] rounded-full overflow-hidden">
+            <div id="dash-next-trophy-bar" class="h-full bg-[#EB7142] w-[84%]"></div>
+          </div>
+          <span id="dash-next-trophy-pct" class="text-[11px] font-bold text-[#EB7142]">84%</span>
+        </div>
+      </div>
+
+      <!-- Zero-State Callout (Visible for New Users) -->
+      <div id="new-user-callout" class="hidden bg-[#244A32] text-white p-4 rounded-[24px] shadow-md flex items-center gap-3 cursor-pointer" onclick="switchTab('record')">
+        <div class="w-11 h-11 rounded-full bg-[#EB7142] flex items-center justify-center text-xl shrink-0">
+          ⏺
+        </div>
+        <div class="flex-1">
+          <h4 class="text-sm font-black">Record Your First Workout</h4>
+          <p class="text-[11px] text-white/80 mt-0.5">Start from 0: Run, Cycle, Walk, Hike, or Weight Training to log live distance and unlock your first trophy!</p>
+        </div>
+        <span>›</span>
+      </div>
+
+      <!-- Recent Activities Feed for this User -->
+      <div class="space-y-2 pt-1">
+        <div class="flex justify-between items-center">
+          <h2 class="text-sm font-black text-[#191C1A]">Recent Activities</h2>
+          <button onclick="switchTab('record')" class="text-xs text-[#244A32] font-bold hover:underline">+ Record New</button>
+        </div>
+        <div id="dash-recent-activities" class="space-y-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: LIVE ACTIVITY RECORDER ==================== -->
+    <div id="screen-record" class="screen-view hidden space-y-3.5 pt-1">
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="switchTab('dashboard')" class="text-xs font-bold text-[#244A32] bg-white border border-[#E8DFC8] px-3 py-1.5 rounded-full shadow-xs">
+          ← Dashboard
+        </button>
+        <h2 class="text-sm font-black text-[#191C1A]">Live Activity Tracker</h2>
+        <!-- BLE Heart Rate Toggle -->
+        <button id="btn-ble-sensor" onclick="toggleBleSensor()" class="text-[10px] font-bold bg-[#F3EDE2] text-[#244A32] border border-[#E8DFC8] px-2.5 py-1.5 rounded-full flex items-center gap-1">
+          <span>💙</span> <span id="ble-btn-label">Pair BLE HR</span>
+        </button>
+      </div>
+
+      <!-- Sport Type Picker (Running, Cycling, Walking, Hiking, Weight Training) -->
+      <div class="bg-white border border-[#E8DFC8] rounded-[22px] p-3 shadow-xs">
+        <span class="block text-[10.5px] font-black uppercase text-[#6B726C] mb-2 tracking-wider">Choose Activity Type</span>
+        <div class="grid grid-cols-5 gap-1.5 text-center">
+          <button onclick="selectSport('running')" id="sport-btn-running" class="sport-select-btn p-2 rounded-xl bg-[#E8F1EC] border-2 border-[#244A32]">
+            <span class="block text-xl">🏃‍♂️</span>
+            <span class="text-[9px] font-bold text-[#244A32]">Run</span>
+          </button>
+          <button onclick="selectSport('cycling')" id="sport-btn-cycling" class="sport-select-btn p-2 rounded-xl bg-[#FAFAF8] border border-[#E8DFC8]">
+            <span class="block text-xl">🚴‍♂️</span>
+            <span class="text-[9px] font-bold text-[#6B726C]">Ride</span>
+          </button>
+          <button onclick="selectSport('walking')" id="sport-btn-walking" class="sport-select-btn p-2 rounded-xl bg-[#FAFAF8] border border-[#E8DFC8]">
+            <span class="block text-xl">🚶‍♂️</span>
+            <span class="text-[9px] font-bold text-[#6B726C]">Walk</span>
+          </button>
+          <button onclick="selectSport('hiking')" id="sport-btn-hiking" class="sport-select-btn p-2 rounded-xl bg-[#FAFAF8] border border-[#E8DFC8]">
+            <span class="block text-xl">🥾</span>
+            <span class="text-[9px] font-bold text-[#6B726C]">Hike</span>
+          </button>
+          <button onclick="selectSport('weight_training')" id="sport-btn-weight_training" class="sport-select-btn p-2 rounded-xl bg-[#FAFAF8] border border-[#E8DFC8]">
+            <span class="block text-xl">🏋️</span>
+            <span class="text-[9px] font-bold text-[#6B726C]">Weights</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- GPS & Sensor Status Bar -->
+      <div class="bg-white border border-[#E8DFC8] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+        <div id="gps-status-indicator" class="flex items-center gap-1.5 font-bold text-[#244A32]">
+          <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+          <span id="gps-status-text">GPS Ready • Accuracy ±4m</span>
+        </div>
+        <div id="ble-hr-live-badge" class="hidden flex items-center gap-1 bg-[#FDF1EC] text-[#EB7142] px-2 py-0.5 rounded-md font-black text-[10px]">
+          <span>❤️</span> <span id="live-hr-bpm">138</span> BPM
+          <span id="live-hr-zone" class="bg-[#EB7142] text-white px-1.5 rounded text-[8.5px]">CARDIO</span>
+        </div>
+      </div>
+
+      <!-- Live Metrics Display Card (Outdoor vs Indoor Weights) -->
+      <div class="bg-white border border-[#E8DFC8] rounded-[28px] p-5 text-center shadow-sm space-y-3">
+        <!-- Huge Distance / Time Display -->
+        <div id="main-metric-outdoor" class="py-2">
+          <div id="rec-distance-display" class="text-6xl font-black text-[#191C1A] tracking-tighter">0.00</div>
+          <div class="text-[11px] font-black tracking-widest text-[#6B726C] uppercase mt-1">KILOMETERS</div>
+        </div>
+
+        <div id="main-metric-indoor" class="hidden py-2">
+          <div id="rec-weights-time" class="text-5xl font-black text-[#191C1A] font-mono">00:00</div>
+          <div class="text-[11px] font-black tracking-widest text-[#6B726C] uppercase mt-1">WORKOUT DURATION</div>
+        </div>
+
+        <!-- 3-Column Secondary Live Stats -->
+        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-[#F0EAE0]">
+          <div class="text-center">
+            <span id="rec-time-display" class="block text-xl font-black font-mono text-[#191C1A]">00:00</span>
+            <span class="text-[9.5px] font-bold text-[#6B726C]">ACTIVE TIME</span>
+          </div>
+          <div class="text-center border-x border-[#F0EAE0]">
+            <span id="rec-pace-display" class="block text-xl font-black text-[#191C1A]">--:--</span>
+            <span id="rec-pace-label" class="text-[9.5px] font-bold text-[#6B726C]">AVG PACE</span>
+          </div>
+          <div class="text-center">
+            <span id="rec-cals-display" class="block text-xl font-black text-[#191C1A]">0</span>
+            <span class="text-[9.5px] font-bold text-[#6B726C]">KCAL</span>
+          </div>
+        </div>
+
+        <!-- Weight Training Sets Counter Box (Visible only for Weight Training) -->
+        <div id="weights-set-box" class="hidden bg-[#F3EDE2] p-3 rounded-2xl flex items-center justify-between">
+          <div>
+            <span id="weights-set-count" class="text-base font-black text-[#244A32]">0 Sets Completed</span>
+            <span class="block text-[10px] text-[#6B726C]">Rest: <strong id="weights-rest-sec">45s</strong> recommended</span>
+          </div>
+          <button onclick="logWeightsSet()" class="bg-[#244A32] text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-xs">
+            + Log Set
+          </button>
+        </div>
+
+        <!-- Breadcrumb Route Simulator Box (Outdoor only) -->
+        <div id="gps-route-box" class="bg-[#F3EDE2] rounded-xl p-2.5 text-center text-xs text-[#244A32] font-semibold flex items-center justify-center gap-1.5">
+          <span>📍</span>
+          <span>Live GPS Telemetry Active • Elevation Gain: +18m</span>
+        </div>
+      </div>
+
+      <!-- Controls: Start / Pause / Resume / Finish -->
+      <div class="pt-2">
+        <button id="btn-record-start" onclick="startActivityRecording()" class="w-full bg-[#244A32] text-white py-4 rounded-2xl font-black text-base shadow-lg hover:bg-[#1b3826] transition flex items-center justify-center gap-2">
+          <span>▶</span>
+          <span id="btn-start-label">START RUNNING</span>
+        </button>
+
+        <div id="record-active-controls" class="hidden grid grid-cols-2 gap-3">
+          <button id="btn-record-pause" onclick="togglePauseRecording()" class="bg-[#F3EDE2] border-2 border-[#E8DFC8] text-[#191C1A] py-3.5 rounded-2xl font-black text-sm">
+            ⏸ Pause
+          </button>
+          <button onclick="finishActivityPrompt()" class="bg-[#EB7142] text-white py-3.5 rounded-2xl font-black text-sm shadow-md">
+            ⏹ Finish & Save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 3: ACTIVITY SUMMARY ==================== -->
+    <div id="screen-summary" class="screen-view hidden space-y-3.5 pt-1">
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="switchTab('record')" class="text-xs font-bold text-[#244A32] bg-white border border-[#E8DFC8] px-3 py-1.5 rounded-full shadow-xs">
+          ← Back
+        </button>
+        <h2 class="text-sm font-black text-[#191C1A]">Workout Summary</h2>
+        <div class="w-8"></div>
+      </div>
+
+      <div class="bg-white border border-[#E8DFC8] rounded-[26px] p-5 shadow-sm space-y-4">
+        <div>
+          <label class="block text-[10.5px] font-black uppercase tracking-wider text-[#6B726C] mb-1">Activity Title (Review & Edit)</label>
+          <input id="sum-title-input" type="text" value="Morning Outdoor Run" class="w-full border-b-2 border-[#244A32] pb-1 text-lg font-black text-[#191C1A] outline-none bg-transparent" />
+          <div class="flex items-center justify-between mt-1 text-xs text-[#6B726C]">
+            <span id="sum-sport-badge" class="bg-[#E8F1EC] text-[#244A32] font-black text-[10px] px-2 py-0.5 rounded">RUNNING</span>
+            <span id="sum-date-badge">Today at 9:45 AM</span>
+          </div>
+        </div>
+
+        <!-- Performance Grid -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-[#F3EDE2] p-3 rounded-xl">
+            <span id="sum-dist-val" class="block text-2xl font-black text-[#191C1A]">5.20 km</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">TOTAL DISTANCE</span>
+          </div>
+          <div class="bg-[#F3EDE2] p-3 rounded-xl">
+            <span id="sum-time-val" class="block text-2xl font-black text-[#191C1A]">28m 40s</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">ACTIVE TIME</span>
+          </div>
+          <div class="bg-[#F3EDE2] p-3 rounded-xl">
+            <span id="sum-pace-val" class="block text-2xl font-black text-[#191C1A]">5:31 /km</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">AVG PACE</span>
+          </div>
+          <div class="bg-[#F3EDE2] p-3 rounded-xl">
+            <span id="sum-cals-val" class="block text-2xl font-black text-[#191C1A]">420 kcal</span>
+            <span class="text-[10px] text-[#6B726C] font-bold">CALORIES BURNED</span>
+          </div>
+        </div>
+
+        <!-- Heart Rate Summary -->
+        <div id="sum-hr-box" class="bg-[#FFF7ED] border border-[#FED7AA] p-3 rounded-xl flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span>❤️</span>
+            <span class="font-bold text-[#9A3412]">Avg HR: 144 BPM (Max 168 BPM)</span>
+          </div>
+          <span class="text-[10px] font-bold text-[#EB7142]">Polar H10 BLE</span>
+        </div>
+
+        <!-- Privacy Setting Selector -->
+        <div>
+          <label class="block text-[10.5px] font-black uppercase tracking-wider text-[#6B726C] mb-1.5">Privacy Settings</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setSummaryPrivacy('public', this)" class="priv-btn p-2 rounded-xl bg-[#244A32] text-white text-xs font-bold">🌍 Public</button>
+            <button onclick="setSummaryPrivacy('followers', this)" class="priv-btn p-2 rounded-xl bg-[#F3EDE2] text-[#191C1A] text-xs font-bold">👥 Followers</button>
+            <button onclick="setSummaryPrivacy('private', this)" class="priv-btn p-2 rounded-xl bg-[#F3EDE2] text-[#191C1A] text-xs font-bold">🔒 Only Me</button>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button onclick="saveCompletedActivity()" class="w-full bg-[#244A32] text-white py-4 rounded-2xl font-black text-sm shadow-md hover:bg-[#1b3826] transition flex items-center justify-center gap-2">
+          <span>💾 Save Activity to Profile</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 4: TROPHY ROOM ==================== -->
+    <div id="screen-achievements" class="screen-view hidden space-y-3.5 pt-1">
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="switchTab('dashboard')" class="text-xs font-bold text-[#244A32] bg-white border border-[#E8DFC8] px-3 py-1.5 rounded-full shadow-xs">
+          ← Back
+        </button>
+        <h2 class="text-base font-black text-[#191C1A]">Trophy Room & Badges</h2>
+        <div class="w-8"></div>
+      </div>
+
+      <!-- Scoreboard Header Card -->
+      <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-4 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <span class="text-[10px] font-black tracking-wider text-[#6B726C] uppercase">Community Points</span>
+            <div id="trophy-room-pts" class="text-3xl font-black text-[#244A32] mt-0.5">850 <span class="text-sm font-bold text-[#6B726C]">pts</span></div>
+          </div>
+          <div class="bg-[#F3EDE2] text-center px-4 py-2 rounded-2xl border border-[#E8DFC8]">
+            <div id="trophy-room-ratio" class="text-base font-black text-[#191C1A]">7 / 23</div>
+            <div class="text-[10px] text-[#6B726C] font-semibold">Trophies</div>
+          </div>
+        </div>
+
+        <!-- 5 Tier Breakdown Pills -->
+        <div class="grid grid-cols-5 gap-1.5 pt-2 border-t border-[#F0EAE0]">
+          <div class="bg-[#FDF7F2] border border-[#CD7F32] rounded-lg py-1 text-center">
+            <span id="tier-count-bronze" class="block text-xs font-black text-[#9B5A1A]">4</span>
+            <span class="text-[8px] font-bold text-[#9B5A1A]">BRONZE</span>
+          </div>
+          <div class="bg-[#F8FAFC] border border-[#94A3B8] rounded-lg py-1 text-center">
+            <span id="tier-count-silver" class="block text-xs font-black text-[#475569]">2</span>
+            <span class="text-[8px] font-bold text-[#475569]">SILVER</span>
+          </div>
+          <div class="bg-[#FEF9C3] border border-[#EAB308] rounded-lg py-1 text-center">
+            <span id="tier-count-gold" class="block text-xs font-black text-[#A16207]">1</span>
+            <span class="text-[8px] font-bold text-[#A16207]">GOLD</span>
+          </div>
+          <div class="bg-[#E0F2FE] border border-[#0284C7] rounded-lg py-1 text-center">
+            <span id="tier-count-plat" class="block text-xs font-black text-[#0369A1]">0</span>
+            <span class="text-[8px] font-bold text-[#0369A1]">PLATINUM</span>
+          </div>
+          <div class="bg-[#FCE7F3] border border-[#BE185D] rounded-lg py-1 text-center">
+            <span id="tier-count-dia" class="block text-xs font-black text-[#9D174D]">0</span>
+            <span class="text-[8px] font-bold text-[#9D174D]">DIAMOND</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trophies List (Dynamically updated for user) -->
+      <div id="trophy-room-list" class="space-y-2.5">
+        <!-- Rendered by JS based on user -->
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 5: ONBOARDING ==================== -->
+    <div id="screen-onboarding" class="screen-view hidden space-y-3.5 pt-1">
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="switchTab('dashboard')" class="text-xs font-bold text-[#244A32] bg-white border border-[#E8DFC8] px-3 py-1.5 rounded-full shadow-xs">
+          ← Back
+        </button>
+        <span class="text-xs font-bold text-[#6B726C]">Mifflin-St Jeor Engine</span>
+        <button onclick="completeOnboarding()" class="text-xs font-bold text-[#244A32] hover:underline">Save</button>
+      </div>
+
+      <div class="bg-white border border-[#E8DFC8] rounded-[24px] p-4 shadow-sm space-y-3">
+        <h3 class="text-sm font-black text-[#191C1A]">Personalized Biological Profile</h3>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[10px] font-bold text-[#6B726C]">Weight (kg)</label>
+            <input type="number" id="onboard-wt" value="74" class="w-full border rounded-xl p-2 text-sm font-bold bg-[#FAFAF8]" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#6B726C]">Height (cm)</label>
+            <input type="number" id="onboard-ht" value="178" class="w-full border rounded-xl p-2 text-sm font-bold bg-[#FAFAF8]" />
+          </div>
+        </div>
+        <button onclick="completeOnboarding()" class="w-full bg-[#244A32] text-white py-3 rounded-xl font-bold text-xs">
+          Save Fitness Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 6: AUTH WELCOME ==================== -->
+    <div id="screen-welcome" class="screen-view hidden space-y-3.5 pt-2">
+      <div class="text-center pt-2">
+        <img src="../assets/avfit_official_logo.png" alt="AVFIT Logo" class="w-16 h-16 rounded-2xl mx-auto shadow-md mb-2 object-cover" />
+        <h1 class="text-2xl font-black text-[#191C1A]">AV<span class="text-[#00A6FF]">FIT</span></h1>
+        <p class="text-xs text-[#6B726C]">One app for the complete fitness journey.</p>
+      </div>
+      <div class="space-y-2 pt-4">
+        <button onclick="switchUserAccount('new_user'); switchTab('dashboard');" class="w-full bg-[#244A32] text-white py-3.5 rounded-2xl font-bold text-sm shadow-md">
+          Sign Up as New Athlete (Starts at 0)
+        </button>
+        <button onclick="switchUserAccount('alex'); switchTab('dashboard');" class="w-full bg-white border-2 border-[#E8DFC8] text-[#191C1A] py-3.5 rounded-2xl font-bold text-sm shadow-xs">
+          Log In as Existing Alex Vance (Has Data)
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Celebration Modal for Milestone Unlocks -->
+  <div id="celebration-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full text-center shadow-2xl border border-[#E8DFC8] animate-pop space-y-3">
+      <div class="text-xs font-black tracking-widest text-[#EB7142] uppercase">MILESTONE UNLOCKED!</div>
+      <div id="celeb-icon" class="w-20 h-20 rounded-full bg-[#FEF9C3] border-4 border-[#EAB308] mx-auto flex items-center justify-center text-4xl shadow-md my-1">
+        🏆
+      </div>
+      <div id="celeb-tier" class="inline-block bg-[#EAB308] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">
+        BRONZE TROPHY
+      </div>
+      <h3 id="celeb-title" class="text-xl font-black text-[#191C1A]">Genesis Pump</h3>
+      <p id="celeb-desc" class="text-xs text-[#6B726C] px-2 leading-relaxed">
+        Completed your very first recorded workout on AVFIT!
+      </p>
+      <div class="bg-[#F3EDE2] p-2.5 rounded-2xl">
+        <div id="celeb-pts" class="text-2xl font-black text-[#244A32]">+25</div>
+        <div class="text-[10px] font-semibold text-[#6B726C]">AVFIT Points Earned</div>
+      </div>
+      <button onclick="closeModal()" class="w-full bg-[#244A32] text-white py-3 rounded-2xl font-bold text-sm shadow-md">
+        Awesome, Let's Go!
+      </button>
+    </div>
+  </div>
+
+  <!-- Floating Bottom Charcoal Navigation Dock with Record Feature -->
+  <nav id="bottom-dock" class="absolute bottom-4 left-5 right-5 h-16 bg-[#161A17] rounded-[36px] px-3 flex justify-around items-center z-40 shadow-2xl">
+    <!-- Tab 1: Dashboard -->
+    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="dock-tab w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#244A32] shadow-sm transition">
+      <span class="text-base font-bold">🏠</span>
+    </button>
+    <!-- Tab 2: Record (Prominent Center Activity Feature) -->
+    <button onclick="switchTab('record')" id="nav-record" class="dock-tab w-10 h-10 rounded-full bg-[#262D28] border border-[#EB7142]/40 flex items-center justify-center text-[#EB7142] hover:bg-[#EB7142] hover:text-white transition">
+      <span class="text-base font-black">⏺</span>
+    </button>
+    <!-- Tab 3: Trophies -->
+    <button onclick="switchTab('achievements')" id="nav-achievements" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+      <span class="text-base">🏆</span>
+    </button>
+    <!-- Tab 4: Onboard -->
+    <button onclick="switchTab('onboarding')" id="nav-onboarding" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+      <span class="text-base">📋</span>
+    </button>
+    <!-- Tab 5: Auth Gateway -->
+    <button onclick="switchTab('welcome')" id="nav-welcome" class="dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition">
+      <span class="text-base">👤</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Home Indicator Bar -->
+  <div class="w-32 h-1 bg-[#161A17] rounded-full mx-auto mb-1.5 z-40 shrink-0 opacity-40"></div>
+
+  <script>
+    // ===================================================================
+    // MULTI-USER ISOLATED DATA STORES
+    // ===================================================================
+    const usersDatabase = {
+      alex: {
+        id: 'usr_alex',
+        name: 'Alex Vance',
+        avatar: '🏃‍♂️',
+        streakDays: 14,
+        totalPoints: 850,
+        calsBurned: 450,
+        totalDistanceKm: 42.5,
+        totalActivities: 12,
+        unlockedTrophies: 7,
+        nextMilestone: { name: '10K Titan', pct: 84 },
+        tierCounts: { bronze: 4, silver: 2, gold: 1, plat: 0, dia: 0 },
+        activities: [
+          { title: 'Morning Park Run', type: 'running', dist: '5.20 km', dur: '28 min', cals: '420 kcal', date: 'Oct 22' },
+          { title: 'Full Body Weights Circuit', type: 'weight_training', dist: '', dur: '35 min', cals: '240 kcal', date: 'Oct 20' }
+        ]
+      },
+      new_user: {
+        id: 'usr_new',
+        name: 'New Athlete',
+        avatar: '✨',
+        streakDays: 0,         // ZERO
+        totalPoints: 0,        // ZERO
+        calsBurned: 0,         // ZERO
+        totalDistanceKm: 0.0,  // ZERO
+        totalActivities: 0,    // ZERO
+        unlockedTrophies: 0,   // ZERO
+        nextMilestone: { name: 'Genesis Pump', pct: 0 },
+        tierCounts: { bronze: 0, silver: 0, gold: 0, plat: 0, dia: 0 },
+        activities: []         // EMPTY
+      }
+    };
+
+    let currentUserId = 'alex';
+
+    function switchUserAccount(userKey) {
+      currentUserId = userKey;
+      document.getElementById('btn-user-alex').className = userKey === 'alex'
+        ? 'px-2 py-0.5 rounded-full bg-[#244A32] text-white shadow-xs'
+        : 'px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs';
+      document.getElementById('btn-user-new').className = userKey === 'new_user'
+        ? 'px-2 py-0.5 rounded-full bg-[#244A32] text-white shadow-xs'
+        : 'px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs';
+
+      document.getElementById('active-user-tag').innerText = userKey === 'alex' ? 'Alex (14d)' : 'New User (0d)';
+
+      renderUserDashboard();
+      renderUserTrophyRoom();
+    }
+
+    function renderUserDashboard() {
+      const u = usersDatabase[currentUserId];
+      document.getElementById('dash-avatar-circle').innerText = u.avatar;
+      document.getElementById('dash-hero-avatar').innerText = u.avatar;
+      document.getElementById('dash-greeting-title').innerText = 'Hey, ' + u.name.split(' ')[0];
+      document.getElementById('dash-streak-days').innerText = u.streakDays + ' Days';
+
+      document.getElementById('dash-cals-burned').innerText = u.calsBurned;
+      document.getElementById('dash-distance-km').innerText = u.totalDistanceKm.toFixed(1);
+      document.getElementById('dash-acts-count').innerText = u.totalActivities;
+
+      document.getElementById('dash-trophy-pts').innerText = u.totalPoints + ' pts';
+      document.getElementById('dash-trophy-count').innerText = u.unlockedTrophies + ' of 23 Milestones Unlocked';
+      document.getElementById('dash-next-trophy-name').innerText = u.nextMilestone.name;
+      document.getElementById('dash-next-trophy-bar').style.width = u.nextMilestone.pct + '%';
+      document.getElementById('dash-next-trophy-pct').innerText = u.nextMilestone.pct + '%';
+
+      if (u.totalActivities === 0) {
+        document.getElementById('dash-hero-status').innerText = 'Ready for Workout #1';
+        document.getElementById('dash-greeting-sub').innerText = 'Welcome to AVFIT • Start your first activity!';
+        document.getElementById('new-user-callout').classList.remove('hidden');
+      } else {
+        document.getElementById('dash-hero-status').innerText = '⚡ ' + u.totalActivities + ' Sessions Completed';
+        document.getElementById('dash-greeting-sub').innerText = 'Day ' + u.streakDays + ' • Consistent Progress';
+        document.getElementById('new-user-callout').classList.add('hidden');
+      }
+
+      // Render recent activities
+      const container = document.getElementById('dash-recent-activities');
+      if (u.activities.length === 0) {
+        container.innerHTML = '<div class="bg-white border border-[#E8DFC8] rounded-xl p-3 text-center text-xs text-[#6B726C]">No recorded activities yet. Tap Record to start!</div>';
+      } else {
+        container.innerHTML = u.activities.map(act => `
+          <div class="bg-white border border-[#E8DFC8] rounded-2xl p-3 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#F3EDE2] flex items-center justify-center text-lg">
+                ${act.type === 'running' ? '🏃‍♂️' : act.type === 'cycling' ? '🚴‍♂️' : act.type === 'weight_training' ? '🏋️' : '🚶‍♂️'}
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-[#191C1A]">${act.title}</h4>
+                <p class="text-[10px] text-[#6B726C]">${act.dist ? act.dist + ' • ' : ''}${act.dur} • ${act.cals}</p>
+              </div>
+            </div>
+            <span class="text-[10px] text-[#6B726C] font-semibold">${act.date}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderUserTrophyRoom() {
+      const u = usersDatabase[currentUserId];
+      document.getElementById('trophy-room-pts').innerHTML = u.totalPoints + ' <span class="text-sm font-bold text-[#6B726C]">pts</span>';
+      document.getElementById('trophy-room-ratio').innerText = u.unlockedTrophies + ' / 23';
+      document.getElementById('tier-count-bronze').innerText = u.tierCounts.bronze;
+      document.getElementById('tier-count-silver').innerText = u.tierCounts.silver;
+      document.getElementById('tier-count-gold').innerText = u.tierCounts.gold;
+      document.getElementById('tier-count-plat').innerText = u.tierCounts.plat;
+      document.getElementById('tier-count-dia').innerText = u.tierCounts.dia;
+
+      const list = document.getElementById('trophy-room-list');
+      if (u.unlockedTrophies === 0) {
+        list.innerHTML = `
+          <div class="bg-[#FAF8F4] border border-[#E8DFC8] rounded-[22px] p-4 flex items-center gap-3 shadow-xs">
+            <div class="w-12 h-12 rounded-full bg-[#EAE2D5] flex items-center justify-center text-xl shrink-0">🔒</div>
+            <div class="flex-1">
+              <h4 class="text-sm font-black text-[#6B726C]">Genesis Pump</h4>
+              <span class="bg-[#CD7F32] text-white text-[9px] font-black px-2 py-0.5 rounded-md">BRONZE</span>
+              <p class="text-xs text-[#6B726C] mt-0.5">Complete your very first guided workout routine.</p>
+              <div class="mt-1 text-[10px] text-[#EB7142] font-bold">0 / 1 workout (0%) • +25 pts</div>
+            </div>
+          </div>
+          <div class="bg-[#FAF8F4] border border-[#E8DFC8] rounded-[22px] p-4 flex items-center gap-3 shadow-xs">
+            <div class="w-12 h-12 rounded-full bg-[#EAE2D5] flex items-center justify-center text-xl shrink-0">🔒</div>
+            <div class="flex-1">
+              <h4 class="text-sm font-black text-[#6B726C]">First Step Forward</h4>
+              <span class="bg-[#CD7F32] text-white text-[9px] font-black px-2 py-0.5 rounded-md">BRONZE</span>
+              <p class="text-xs text-[#6B726C] mt-0.5">Log your first 1,000 steps in a single day.</p>
+              <div class="mt-1 text-[10px] text-[#EB7142] font-bold">0 / 1,000 steps (0%) • +25 pts</div>
+            </div>
+          </div>
+        `;
+      } else {
+        list.innerHTML = `
+          <div class="bg-white border border-[#E8DFC8] rounded-[22px] p-3.5 flex items-center gap-3.5 shadow-xs">
+            <div class="w-12 h-12 rounded-full bg-[#FDF7F2] border-2 border-[#CD7F32] flex items-center justify-center text-xl shrink-0">👟</div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-black text-[#191C1A]">First Step Forward</h4>
+                <span class="bg-[#CD7F32] text-white text-[9px] font-black px-2 py-0.5 rounded-md">BRONZE</span>
+              </div>
+              <p class="text-xs text-[#6B726C] mt-0.5">Log your first 1,000 steps in a single day.</p>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-[11px] font-bold text-[#244A32]">✓ Earned +25 pts</span>
+                <span class="text-[10px] font-bold text-[#6B726C] bg-[#F3EDE2] px-2 py-0.5 rounded">Oct 10</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white border border-[#E8DFC8] rounded-[22px] p-3.5 flex items-center gap-3.5 shadow-xs">
+            <div class="w-12 h-12 rounded-full bg-[#FEF9C3] border-2 border-[#EAB308] flex items-center justify-center text-xl shrink-0">🔥</div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-black text-[#191C1A]">Weekly Warrior</h4>
+                <span class="bg-[#EAB308] text-white text-[9px] font-black px-2 py-0.5 rounded-md">GOLD</span>
+              </div>
+              <p class="text-xs text-[#6B726C] mt-0.5">Maintain an active 7-day movement streak.</p>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-[11px] font-bold text-[#244A32]">✓ Earned +150 pts</span>
+                <span class="text-[10px] font-bold text-[#6B726C] bg-[#F3EDE2] px-2 py-0.5 rounded">Oct 17</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ===================================================================
+    // NAVIGATION & TAB SWITCHER
+    // ===================================================================
+    function switchTab(tabId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.dock-tab').forEach(el => {
+        el.className = 'dock-tab w-10 h-10 rounded-full flex items-center justify-center text-[#6F7771] hover:text-white transition';
+      });
+
+      document.querySelectorAll('.nav-pill').forEach(el => {
+        el.className = 'nav-pill px-2 py-0.5 rounded-full bg-white text-[#191C1A] shadow-xs';
+      });
+      const activePill = document.getElementById('pill-' + tabId);
+      if (activePill) {
+        activePill.className = 'nav-pill px-2 py-0.5 rounded-full bg-[#244A32] text-white shadow-xs';
+      }
+
+      const activeScreen = document.getElementById('screen-' + tabId);
+      if (activeScreen) activeScreen.classList.remove('hidden');
+
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) {
+        if (tabId === 'record') {
+          activeNav.className = 'dock-tab w-10 h-10 rounded-full bg-[#EB7142] text-white shadow-md transition';
+        } else {
+          activeNav.className = 'dock-tab w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#244A32] shadow-sm transition';
+        }
+      }
+
+      document.getElementById('mobile-viewport').scrollTop = 0;
+    }
+
+    // ===================================================================
+    // LIVE ACTIVITY TRACKING STATE MACHINE
+    // ===================================================================
+    let selectedSportType = 'running';
+    let isTracking = false;
+    let isPaused = false;
+    let activeSec = 0;
+    let trackerInterval = null;
+    let distanceKm = 0.0;
+    let calsBurned = 0;
+    let bleSensorActive = false;
+    let liveBpm = 138;
+    let setsCount = 0;
+
+    function selectSport(sport) {
+      selectedSportType = sport;
+      document.querySelectorAll('.sport-select-btn').forEach(b => {
+        b.className = 'sport-select-btn p-2 rounded-xl bg-[#FAFAF8] border border-[#E8DFC8]';
+      });
+      document.getElementById('sport-btn-' + sport).className = 'sport-select-btn p-2 rounded-xl bg-[#E8F1EC] border-2 border-[#244A32]';
+
+      document.getElementById('btn-start-label').innerText = 'START ' + sport.toUpperCase().replace('_', ' ');
+
+      if (sport === 'weight_training') {
+        document.getElementById('main-metric-outdoor').classList.add('hidden');
+        document.getElementById('main-metric-indoor').classList.remove('hidden');
+        document.getElementById('gps-route-box').classList.add('hidden');
+        document.getElementById('weights-set-box').classList.remove('hidden');
+        document.getElementById('gps-status-indicator').innerHTML = '<span class="w-2 h-2 rounded-full bg-[#244A32]"></span><span>Indoor Mode • No GPS</span>';
+        document.getElementById('rec-pace-label').innerText = 'TOTAL REPS';
+        document.getElementById('rec-pace-display').innerText = '0';
+      } else {
+        document.getElementById('main-metric-outdoor').classList.remove('hidden');
+        document.getElementById('main-metric-indoor').classList.add('hidden');
+        document.getElementById('gps-route-box').classList.remove('hidden');
+        document.getElementById('weights-set-box').classList.add('hidden');
+        document.getElementById('gps-status-indicator').innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span><span>GPS Ready • Accuracy ±4m</span>';
+        document.getElementById('rec-pace-label').innerText = sport === 'cycling' ? 'SPEED' : 'AVG PACE';
+      }
+    }
+
+    function toggleBleSensor() {
+      bleSensorActive = !bleSensorActive;
+      const btn = document.getElementById('btn-ble-sensor');
+      const badge = document.getElementById('ble-hr-live-badge');
+      if (bleSensorActive) {
+        btn.className = 'text-[10px] font-bold bg-[#244A32] text-white px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-xs';
+        document.getElementById('ble-btn-label').innerText = 'Polar H10 (BLE)';
+        badge.classList.remove('hidden');
+        alert('Connected to Polar H10 BLE Sensor! Live heart rate stream active.');
+      } else {
+        btn.className = 'text-[10px] font-bold bg-[#F3EDE2] text-[#244A32] border border-[#E8DFC8] px-2.5 py-1.5 rounded-full flex items-center gap-1';
+        document.getElementById('ble-btn-label').innerText = 'Pair BLE HR';
+        badge.classList.add('hidden');
+      }
+    }
+
+    function startActivityRecording() {
+      isTracking = true;
+      isPaused = false;
+      activeSec = 0;
+      distanceKm = 0.0;
+      calsBurned = 0;
+      setsCount = 0;
+
+      document.getElementById('btn-record-start').classList.add('hidden');
+      document.getElementById('record-active-controls').classList.remove('hidden');
+
+      clearInterval(trackerInterval);
+      trackerInterval = setInterval(() => {
+        if (!isPaused) {
+          activeSec++;
+
+          // Update timer display
+          const m = Math.floor(activeSec / 60);
+          const s = activeSec % 60;
+          const timeStr = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+          document.getElementById('rec-time-display').innerText = timeStr;
+          document.getElementById('rec-weights-time').innerText = timeStr;
+
+          // Increment distance for outdoor
+          if (selectedSportType !== 'weight_training') {
+            const factor = selectedSportType === 'cycling' ? 0.006 : selectedSportType === 'running' ? 0.0028 : 0.0014;
+            distanceKm += factor;
+            document.getElementById('rec-distance-display').innerText = distanceKm.toFixed(2);
+
+            // Pace calculation
+            if (distanceKm > 0.05) {
+              const secPerKm = Math.round(activeSec / distanceKm);
+              const pM = Math.floor(secPerKm / 60);
+              const pS = secPerKm % 60;
+              document.getElementById('rec-pace-display').innerText = pM + ':' + (pS < 10 ? '0' + pS : pS) + ' /km';
+            }
+          }
+
+          // Calorie calculation
+          const met = selectedSportType === 'running' ? 9.8 : selectedSportType === 'cycling' ? 7.5 : 5.0;
+          calsBurned = Math.round((met * 70 * (activeSec / 3600)) * (bleSensorActive ? 1.1 : 1.0));
+          document.getElementById('rec-cals-display').innerText = calsBurned;
+
+          // Live HR variation
+          if (bleSensorActive) {
+            liveBpm = Math.min(178, Math.max(122, liveBpm + (Math.floor(Math.random() * 3) - 1)));
+            document.getElementById('live-hr-bpm').innerText = liveBpm;
+          }
+        }
+      }, 1000);
+    }
+
+    function togglePauseRecording() {
+      isPaused = !isPaused;
+      const pauseBtn = document.getElementById('btn-record-pause');
+      if (isPaused) {
+        pauseBtn.innerText = '▶ Resume';
+        pauseBtn.className = 'bg-[#244A32] text-white py-3.5 rounded-2xl font-black text-sm';
+      } else {
+        pauseBtn.innerText = '⏸ Pause';
+        pauseBtn.className = 'bg-[#F3EDE2] border-2 border-[#E8DFC8] text-[#191C1A] py-3.5 rounded-2xl font-black text-sm';
+      }
+    }
+
+    function logWeightsSet() {
+      setsCount++;
+      document.getElementById('weights-set-count').innerText = setsCount + ' Sets Completed';
+      document.getElementById('rec-pace-display').innerText = (setsCount * 10);
+    }
+
+    function finishActivityPrompt() {
+      clearInterval(trackerInterval);
+      isTracking = false;
+
+      // Populate Summary Screen
+      const m = Math.floor(activeSec / 60);
+      const s = activeSec % 60;
+      document.getElementById('sum-title-input').value = 'Afternoon ' + selectedSportType.charAt(0).toUpperCase() + selectedSportType.slice(1) + ' Session';
+      document.getElementById('sum-sport-badge').innerText = selectedSportType.toUpperCase();
+      document.getElementById('sum-dist-val').innerText = distanceKm.toFixed(2) + ' km';
+      document.getElementById('sum-time-val').innerText = m + 'm ' + s + 's';
+      document.getElementById('sum-cals-val').innerText = Math.max(12, calsBurned) + ' kcal';
+
+      if (bleSensorActive) {
+        document.getElementById('sum-hr-box').classList.remove('hidden');
+      } else {
+        document.getElementById('sum-hr-box').classList.add('hidden');
+      }
+
+      // Reset controls
+      document.getElementById('btn-record-start').classList.remove('hidden');
+      document.getElementById('record-active-controls').classList.add('hidden');
+
+      switchTab('summary');
+    }
+
+    function setSummaryPrivacy(type, btn) {
+      document.querySelectorAll('.priv-btn').forEach(b => {
+        b.className = 'priv-btn p-2 rounded-xl bg-[#F3EDE2] text-[#191C1A] text-xs font-bold';
+      });
+      btn.className = 'priv-btn p-2 rounded-xl bg-[#244A32] text-white text-xs font-bold';
+    }
+
+    function saveCompletedActivity() {
+      const u = usersDatabase[currentUserId];
+      const title = document.getElementById('sum-title-input').value;
+      const cals = Math.max(12, calsBurned);
+
+      // 1. Update user's isolated data
+      u.totalActivities++;
+      u.totalDistanceKm += distanceKm;
+      u.calsBurned += cals;
+      u.streakDays = u.streakDays === 0 ? 1 : u.streakDays;
+
+      u.activities.unshift({
+        title: title,
+        type: selectedSportType,
+        dist: distanceKm > 0 ? distanceKm.toFixed(2) + ' km' : '',
+        dur: Math.max(1, Math.round(activeSec / 60)) + ' min',
+        cals: cals + ' kcal',
+        date: 'Today'
+      });
+
+      // 2. Check milestone: If this is their 1st workout ever, unlock Genesis Pump!
+      let unlockedTrophy = null;
+      if (u.unlockedTrophies === 0) {
+        u.unlockedTrophies = 1;
+        u.totalPoints += 25;
+        u.tierCounts.bronze += 1;
+        u.nextMilestone = { name: 'First Step Forward', pct: 40 };
+        unlockedTrophy = {
+          tier: 'BRONZE',
+          title: 'Genesis Pump',
+          desc: 'Completed your very first recorded workout on AVFIT!',
+          pts: '+25'
+        };
+      }
+
+      renderUserDashboard();
+      renderUserTrophyRoom();
+
+      if (unlockedTrophy) {
+        // Show celebration popup
+        document.getElementById('celeb-tier').innerText = unlockedTrophy.tier + ' TROPHY';
+        document.getElementById('celeb-title').innerText = unlockedTrophy.title;
+        document.getElementById('celeb-desc').innerText = unlockedTrophy.desc;
+        document.getElementById('celeb-pts').innerText = unlockedTrophy.pts;
+        document.getElementById('celebration-modal').classList.remove('hidden');
+      } else {
+        alert('Activity saved! Your statistics and community points have been updated.');
+        switchTab('dashboard');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('celebration-modal').classList.add('hidden');
+      switchTab('dashboard');
+    }
+
+    // Initialize initial render
+    renderUserDashboard();
+    renderUserTrophyRoom();
+  </script>
+</body>
+</html>

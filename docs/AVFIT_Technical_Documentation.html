@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AVFIT - Technical Architecture & Product Specification</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 8pt;
+        color: #889299;
+      }
+      @bottom-left {
+        content: "AVFIT Technical Documentation | Confidential & Proprietary";
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 8pt;
+        color: #889299;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.55;
+      color: #191C1A;
+      background-color: #FFFFFF;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Print & Page Break Management */
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 30px;
+      background: linear-gradient(145deg, #161A17 0%, #1E2721 50%, #244A32 100%);
+      color: #FAF8F4;
+      border-radius: 12px;
+    }
+    .cover-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 20px;
+      margin-right: 6px;
+    }
+    .badge-cyan { background: rgba(56, 225, 255, 0.2); color: #38E1FF; border: 1px solid #38E1FF; }
+    .badge-green { background: rgba(74, 222, 128, 0.2); color: #4ADE80; border: 1px solid #4ADE80; }
+    .badge-orange { background: rgba(235, 113, 66, 0.2); color: #EB7142; border: 1px solid #EB7142; }
+    .badge-gold { background: rgba(234, 179, 8, 0.2); color: #FACC15; border: 1px solid #FACC15; }
+
+    .cover-body {
+      margin: auto 0;
+    }
+    .cover-title {
+      font-size: 32pt;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+    .cover-title span {
+      background: linear-gradient(90deg, #38E1FF, #4ADE80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cover-subtitle {
+      font-size: 13pt;
+      font-weight: 400;
+      color: #D3DDD6;
+      max-width: 620px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .meta-item label {
+      display: block;
+      font-size: 7.5pt;
+      color: #94A39B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .meta-item div {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #FAF8F4;
+    }
+    .cover-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 16px;
+      font-size: 8pt;
+      color: #A3B0A7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Headings */
+    h1 {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #244A32;
+      border-bottom: 2px solid #E8DFC8;
+      padding-bottom: 8px;
+      margin-top: 24px;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+      page-break-before: always;
+    }
+    h1:first-of-type {
+      page-break-before: auto;
+    }
+    h2 {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #173322;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+      border-left: 4px solid #244A32;
+      padding-left: 10px;
+    }
+    h3 {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #244A32;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    /* TOC */
+    .toc-container {
+      background: #FAF8F4;
+      border: 1px solid #E8DFC8;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .toc-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #244A32;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #E8DFC8;
+      padding-bottom: 6px;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+    }
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5pt;
+      padding: 3px 0;
+      border-bottom: 1px dotted #DCD4BF;
+    }
+    .toc-item .title { font-weight: 500; color: #191C1A; }
+    .toc-item .sec { font-weight: 700; color: #244A32; margin-right: 6px; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin: 12px 0 16px 0;
+      background: #FFFFFF;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #E2D9C5;
+      padding: 7px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #F3EDE2;
+      color: #173322;
+      font-weight: 600;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:nth-child(even) td {
+      background: #FAF8F4;
+    }
+
+    /* Callout & Alert Boxes */
+    .callout {
+      border-left: 4px solid #244A32;
+      background: #F0F6F2;
+      padding: 10px 14px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9pt;
+      page-break-inside: avoid;
+    }
+    .callout.warning {
+      border-left-color: #EB7142;
+      background: #FDF3EE;
+    }
+    .callout.info {
+      border-left-color: #00A6FF;
+      background: #F0F9FF;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #173322;
+    }
+    .callout.warning .callout-title { color: #A53610; }
+    .callout.info .callout-title { color: #0369A1; }
+
+    /* Code Blocks */
+    pre {
+      background: #161A17;
+      color: #E2E8F0;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 8pt;
+      line-height: 1.45;
+      margin: 10px 0 14px 0;
+      overflow-x: auto;
+      page-break-inside: avoid;
+      border: 1px solid #2B352E;
+    }
+    code {
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      font-size: 8.5pt;
+      background: #F3EDE2;
+      color: #8C2F00;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Diagrams & Visuals */
+    .diagram-box {
+      background: #FAF8F4;
+      border: 1px solid #E8DFC8;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 14px 0;
+      page-break-inside: avoid;
+      text-align: center;
+    }
+    .diagram-caption {
+      font-size: 8pt;
+      color: #6B726C;
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    /* Metric Cards Grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 12px 0 16px 0;
+      page-break-inside: avoid;
+    }
+    .metric-card {
+      background: #FAF8F4;
+      border: 1px solid #E8DFC8;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+    .metric-card .num {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #244A32;
+      line-height: 1.1;
+    }
+    .metric-card .label {
+      font-size: 7.5pt;
+      color: #6B726C;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Feature Pillars */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0 16px 0;
+      page-break-inside: avoid;
+    }
+    .pillar-card {
+      background: #FAF8F4;
+      border: 1px solid #E8DFC8;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .pillar-card h4 {
+      color: #244A32;
+      font-size: 9.5pt;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+    .pillar-card p {
+      font-size: 8.5pt;
+      margin-bottom: 0;
+      color: #4A524D;
+    }
+
+    ul, ol {
+      margin: 6px 0 12px 20px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+
+    .footer-stamp {
+      text-align: right;
+      font-size: 7.5pt;
+      color: #949B95;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page page-break">
+    <div class="cover-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <svg width="42" height="42" viewBox="0 0 512 512" fill="none">
+          <rect width="512" height="512" rx="128" fill="#0F1115" stroke="#23272F" stroke-width="12" />
+          <path d="M 128 420 L 162 420 L 232 250 C 238 236, 252 236, 260 250 L 278 286 L 225 352 C 205 378, 188 398, 168 414 L 128 420 Z" fill="#38E1FF" />
+          <path d="M 298 288 L 325 240 C 329 232, 337 232, 346 232 L 372 232 L 330 314 C 324 316, 312 318, 298 320 Z" fill="#00A6FF" />
+          <path d="M 172 372 C 220 348, 285 318, 340 306 C 330 316, 315 325, 298 332 C 252 350, 205 365, 172 372 Z" fill="#6BE8FF" />
+        </svg>
+        <div>
+          <div style="font-size: 13pt; font-weight: 800; letter-spacing: 0.1em; color: #FFFFFF;">AVFIT</div>
+          <div style="font-size: 7pt; color: #94A39B; text-transform: uppercase;">by Vyalwin Technologies</div>
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-cyan">v1.2.0 Production</span>
+        <span class="badge badge-green">Enterprise Architecture</span>
+      </div>
+    </div>
+
+    <div class="cover-body">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <span class="badge badge-gold">Expo SDK 51</span>
+        <span class="badge badge-cyan">Google Gemini 1.5 Flash</span>
+        <span class="badge badge-green">Supabase PostgreSQL</span>
+        <span class="badge badge-orange">Mifflin-St Jeor Engine</span>
+      </div>
+      <div class="cover-title">
+        AVFIT MOBILE PLATFORM<br>
+        <span>TECHNICAL ARCHITECTURE & SPECIFICATION</span>
+      </div>
+      <div class="cover-subtitle">
+        A comprehensive engineering blueprint detailing the unified fitness ecosystem: dual phone SMS/email authentication, scientific metabolic profiling, Strava-grade outdoor GPS walking analyzer with screen-off endurance, Gemini Vision multimodal food intelligence, interactive home workouts, 25-trophy gamification, and Row-Level Security cloud data architecture.
+      </div>
+
+      <div class="cover-meta-grid">
+        <div class="meta-item">
+          <label>Target Platforms</label>
+          <div>Android & iOS (React Native)</div>
+        </div>
+        <div class="meta-item">
+          <label>Backend Infrastructure</label>
+          <div>Supabase (Postgres + RLS)</div>
+        </div>
+        <div class="meta-item">
+          <label>AI Vision Engine</label>
+          <div>Gemini 1.5 Flash Vision</div>
+        </div>
+        <div class="meta-item">
+          <label>Release State</label>
+          <div>Production APK Deployed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div>Authors: Vyalwin Engineering Team (Lead Architects & Full-Stack Core)</div>
+      <div>Repository: github.com/vjvijay23/AVFIT | Date: October 2026</div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc-container avoid-break">
+    <div class="toc-title">Table of Contents</div>
+    <div class="toc-grid">
+      <div>
+        <div class="toc-item"><span class="title"><span class="sec">1.</span> Executive Summary & Product Vision</span><span>4</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">2.</span> System Architecture & Zero-Budget Economics</span><span>5</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">3.</span> Navigation Hierarchy & Screen Flows</span><span>7</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">4.</span> Phone Number OTP & Security Engine</span><span>8</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">5.</span> Scientific Metabolic Profiling (Mifflin-St Jeor)</span><span>10</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">6.</span> Unified Health Dashboard & Daily Rings</span><span>12</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">7.</span> Strava-Grade GPS Outdoor Walking Analyzer</span><span>14</span></div>
+      </div>
+      <div>
+        <div class="toc-item"><span class="title"><span class="sec">8.</span> Google Gemini 1.5 Flash Food Vision Pipeline</span><span>17</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">9.</span> Interactive Home Workouts & Smart Timers</span><span>19</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">10.</span> Gamified 25-Trophy Engine & Anti-Cheat Logic</span><span>21</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">11.</span> Social Community & Leaderboard Ecosystem</span><span>23</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">12.</span> Production PostgreSQL Database Schema & RLS</span><span>25</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">13.</span> UI/UX Editorial Design Tokens & Brand Kit</span><span>29</span></div>
+        <div class="toc-item"><span class="title"><span class="sec">14.</span> Build Engineering, EAS Deployment & Roadmap</span><span>31</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <h1>1. Executive Summary & Product Vision</h1>
+
+  <h2>1.1 The Fragmented Fitness Landscape</h2>
+  <p>
+    Contemporary fitness enthusiasts face a pervasive modern dilemma: managing everyday health requires juggling 4 to 6 disparate single-purpose apps. A user typically maintains:
+  </p>
+  <ul>
+    <li><strong>A Pedometer / Activity Monitor</strong> (e.g. Google Fit, Apple Health, Pacer) for recording daily steps and baseline movement.</li>
+    <li><strong>An Outdoor Tracking Platform</strong> (e.g. Strava, Nike Run Club) for recording GPS trail coordinates, kilometer split times, and elevation gains.</li>
+    <li><strong>A Calorie & Macronutrient Tracker</strong> (e.g. MyFitnessPal, Cronometer, Lose It!) with cumbersome manual search forms, paywalled barcode scanners, and friction-laden ingredient weighing.</li>
+    <li><strong>A Guided Exercise App</strong> (e.g. Nike Training Club, Freeletics) for bodyweight circuits, rep pacing, and interval rest timers.</li>
+    <li><strong>A Social Motivation Network</strong> for competing with friends, sharing fitness milestone badges, and celebrating health milestones.</li>
+  </ul>
+  <p>
+    This fragmentation induces <em>app fatigue</em>, conflicting data models, high subscription costs ($80 to $150+ annually across platforms), and ultimately goal abandonment.
+  </p>
+
+  <h2>1.2 The AVFIT Unified Solution</h2>
+  <p>
+    <strong>AVFIT</strong> (engineered by Vyalwin) unifies the full spectrum of personal athletic wellness into a single, cohesive, high-performance mobile application. Built on an organic editorial aesthetic (Warm Cream, Deep Forest Green, Terracotta Orange, and Satin Charcoal), AVFIT provides:
+  </p>
+
+  <div class="pillar-grid">
+    <div class="pillar-card">
+      <h4>⚡ Instant Multimodal AI Vision</h4>
+      <p>Users snap a single photo of any home-cooked or restaurant dish. Google Gemini 1.5 Flash identifies recipes, computes portion weights, and breaks down Calories, Protein, Carbs, Fat, and Dietary Fiber in under 2.8 seconds.</p>
+    </div>
+    <div class="pillar-card">
+      <h4>🏃 Outdoor Walking & Running GPS Analyzer</h4>
+      <p>Continuous screen-off GPS breadcrumb logging via an Android Foreground Service, Haversine distance integration, kilometer splits table, and Grade Adjusted Pace (GAP) calculation.</p>
+    </div>
+    <div class="pillar-card">
+      <h4>🧬 Scientific Metabolic Engine</h4>
+      <p>Precision Mifflin-St Jeor BMR and TDEE formulas, calculating customized calorie allowances and macronutrient distributions customized to biological sex, height, weight, age, and fitness goals.</p>
+    </div>
+    <div class="pillar-card">
+      <h4>🏆 25-Trophy Gamification Room</h4>
+      <p>A multi-tier trophy ecosystem (Bronze, Silver, Gold, Platinum, Diamond) backed by server-side PostgreSQL triggers that guarantee tamper-proof milestone unlocking and community status.</p>
+    </div>
+  </div>
+
+  <h2>1.3 Target User Personas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Persona</th>
+        <th style="width: 25%;">Core Needs & Goals</th>
+        <th style="width: 25%;">Pain Points with Existing Tools</th>
+        <th style="width: 30%;">How AVFIT Delivers Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Alex (26)<br>Corporate Analyst</strong></td>
+        <td>Hit 10,000 steps daily, reverse sedentary desk habits, and shed 7kg without complex logging.</td>
+        <td>Too mentally drained after work to type in 12 lunch ingredients; skips food logging within 5 days.</td>
+        <td>Snaps lunch plate with AI camera in 3 seconds; ambient step ring widget provides constant passive accountability.</td>
+      </tr>
+      <tr>
+        <td><strong>Priya (22)<br>University Athlete</strong></td>
+        <td>Build lean muscle, guarantee 130g daily protein intake, and track 5K trail times with friends.</td>
+        <td>Prohibitive subscription fees on specialty macro apps; lonely workout sessions without community.</td>
+        <td>Free Mifflin-St Jeor macro generator, GPS outdoor splits analyzer, and interactive community feed with high-fives.</td>
+      </tr>
+      <tr>
+        <td><strong>David (35)<br>Parent & Remote Worker</strong></td>
+        <td>Time-efficient 15-minute home workouts with zero equipment; track cardiovascular progress.</td>
+        <td>Gym routines require heavy gear; disjointed health data between smart bands and mobile trackers.</td>
+        <td>Guided bodyweight workout library with haptic rest chimes, live walk analyzer, and cumulative streak preservation.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 2 -->
+  <h1>2. System Architecture & Zero-Budget Economics</h1>
+
+  <h2>2.1 High-Level Component Topology</h2>
+  <p>
+    The AVFIT platform adopts a <strong>Client-Edge-Cloud Hybrid Architecture</strong>. The presentation layer runs natively on the mobile client (React Native / Expo SDK 51), communicating securely via HTTPS/WebSockets with Supabase Serverless Cloud (PostgreSQL 15 with Row-Level Security) and the Google Gemini 1.5 Flash Vision Multimodal AI inference endpoint.
+  </p>
+
+  <div class="diagram-box">
+    <svg width="640" height="230" viewBox="0 0 640 230" fill="none" style="max-width: 100%;">
+      <!-- Mobile Client Box -->
+      <rect x="10" y="20" width="220" height="190" rx="8" fill="#F0F6F2" stroke="#244A32" stroke-width="2" />
+      <text x="120" y="42" font-size="11" font-weight="700" fill="#244A32" text-anchor="middle">REACT NATIVE / EXPO CLIENT</text>
+      <rect x="25" y="55" width="190" height="28" rx="4" fill="#FFFFFF" stroke="#CBD5E1" />
+      <text x="120" y="73" font-size="9" fill="#1E293B" text-anchor="middle">Presentation (Navigation & Screens)</text>
+      <rect x="25" y="90" width="190" height="28" rx="4" fill="#FFFFFF" stroke="#CBD5E1" />
+      <text x="120" y="108" font-size="9" fill="#1E293B" text-anchor="middle">Location & Walking Foreground Service</text>
+      <rect x="25" y="125" width="190" height="28" rx="4" fill="#FFFFFF" stroke="#CBD5E1" />
+      <text x="120" y="143" font-size="9" fill="#1E293B" text-anchor="middle">Mifflin-St Jeor & Metric Calculators</text>
+      <rect x="25" y="160" width="190" height="36" rx="4" fill="#FFFFFF" stroke="#CBD5E1" />
+      <text x="120" y="176" font-size="8.5" fill="#1E293B" text-anchor="middle">Local Storage & Offline Queue</text>
+      <text x="120" y="189" font-size="7.5" fill="#64748B" text-anchor="middle">(AsyncStorage / Local Cache)</text>
+
+      <!-- Arrows -->
+      <path d="M 230 85 L 340 85" stroke="#244A32" stroke-width="2" marker-end="url(#arrow)" />
+      <text x="285" y="77" font-size="8" fill="#244A32" font-weight="600" text-anchor="middle">HTTPS / TLS 1.3</text>
+      <path d="M 230 160 L 340 160" stroke="#00A6FF" stroke-width="2" marker-end="url(#arrow-blue)" />
+      <text x="285" y="152" font-size="8" fill="#00A6FF" font-weight="600" text-anchor="middle">Base64 Vision API</text>
+
+      <!-- Cloud Box (Supabase) -->
+      <rect x="340" y="20" width="280" height="110" rx="8" fill="#F8FAFC" stroke="#0284C7" stroke-width="2" />
+      <text x="480" y="42" font-size="11" font-weight="700" fill="#0369A1" text-anchor="middle">SUPABASE CLOUD INFRASTRUCTURE</text>
+      <rect x="355" y="55" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#94A3B8" />
+      <text x="415" y="74" font-size="8.5" font-weight="600" fill="#0F172A" text-anchor="middle">Postgres 15 (RLS)</text>
+      <rect x="485" y="55" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#94A3B8" />
+      <text x="545" y="74" font-size="8.5" font-weight="600" fill="#0F172A" text-anchor="middle">Auth (OTP / JWT)</text>
+      <rect x="355" y="92" width="250" height="26" rx="4" fill="#FFFFFF" stroke="#94A3B8" />
+      <text x="480" y="109" font-size="8.5" fill="#475569" text-anchor="middle">Automated Trophy & Streak Triggers</text>
+
+      <!-- AI Box (Gemini) -->
+      <rect x="340" y="145" width="280" height="65" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2" />
+      <text x="480" y="167" font-size="10.5" font-weight="700" fill="#B45309" text-anchor="middle">GOOGLE GEMINI 1.5 FLASH</text>
+      <text x="480" y="185" font-size="8.5" fill="#78350F" text-anchor="middle">Multimodal Vision Inference | Structured JSON Output</text>
+      <text x="480" y="198" font-size="7.5" fill="#92400E" text-anchor="middle">Dish Recognition • Portions • Macros • Micronutrients</text>
+    </svg>
+    <div class="diagram-caption">Figure 2.1: AVFIT High-Level Architecture — Mobile Client, Supabase Cloud, and Gemini Multimodal AI.</div>
+  </div>
+
+  <h2>2.2 Zero-Budget Operating Economics ($0 MVP Baseline)</h2>
+  <p>
+    A foundational architectural requirement for AVFIT was enabling an autonomous 2-developer sprint to launch a feature-complete product with <strong>zero upfront infrastructure overhead</strong>. By strategically utilizing free-tier cloud architectures, AVFIT can comfortably support <strong>50,000 monthly active users (MAU)</strong> with zero operational server invoices:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Infrastructure Layer</th>
+        <th>Selected Provider</th>
+        <th>Allocated Free Quota</th>
+        <th>AVFIT Resource Utilization</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mobile Runtime & Builds</strong></td>
+        <td>Expo Application Services (EAS)</td>
+        <td>Free managed builds (30 Android/iOS builds/mo)</td>
+        <td>Stand-alone production APK compilation & live QR testing.</td>
+      </tr>
+      <tr>
+        <td><strong>User Identity & Auth</strong></td>
+        <td>Supabase Auth</td>
+        <td>50,000 Monthly Active Users (MAU)</td>
+        <td>Dual phone OTP and passwordless session JWT tokens.</td>
+      </tr>
+      <tr>
+        <td><strong>Database & Triggers</strong></td>
+        <td>Supabase PostgreSQL</td>
+        <td>500 MB relational storage & 500k egress</td>
+        <td>12 core tables with RLS and automated trophy triggers.</td>
+      </tr>
+      <tr>
+        <td><strong>Media & Photo Storage</strong></td>
+        <td>Supabase Storage Buckets</td>
+        <td>1 GB high-performance S3-compatible storage</td>
+        <td>Compressed meal snapshots and user avatar assets.</td>
+      </tr>
+      <tr>
+        <td><strong>Multimodal Vision AI</strong></td>
+        <td>Google Gemini 1.5 Flash</td>
+        <td>15 Requests/Min (RPM), 1,500 Requests/Day</td>
+        <td>Sub-second meal parsing with structured JSON schema.</td>
+      </tr>
+      <tr>
+        <td><strong>GPS & Step Telemetry</strong></td>
+        <td>Native Hardware OS Sensors</td>
+        <td>100% on-device hardware computing</td>
+        <td>Zero API cost pedometer and GPS breadcrumb recording.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3 -->
+  <h1>3. Navigation Hierarchy & Screen Flows</h1>
+
+  <h2>3.1 Dual-Tier Navigation Architecture</h2>
+  <p>
+    AVFIT utilizes a hybrid navigation topology combining a top-level <strong>Native Stack Navigator</strong> (managing unauthenticated gateway flows, full-screen workout/activity recorders, onboarding wizards, and detail views) with a persistent <strong>Bottom Floating Pill Tab Bar</strong> for the primary application experience:
+  </p>
+
+  <div class="diagram-box">
+    <pre>
+RootNavigator (NativeStackNavigator)
+├── Auth Stack (initialRouteName: "AuthWelcome")
+│   ├── AuthWelcomeScreen      [Landing, brand identity, signup/login entry points]
+│   ├── LoginScreen            [Standard email/password credentials authentication]
+│   ├── SignupScreen           [New user registration with email confirmation]
+│   ├── PhoneAuthScreen        [Phone number input with country selector & consent banner]
+│   └── OtpVerificationScreen  [6-cell auto-advancing SMS code entry with 60s cooldown]
+│
+├── Onboarding Flow
+│   └── FitnessOnboardingScreen [4-step wizard: Demographics -> Activity -> Target -> Preview]
+│
+├── Main Application (BottomTabNavigator - Floating Dark Charcoal Pill)
+│   ├── Tab 1: DashboardScreen         [Health rings, streak, water, calorie bank, quick actions]
+│   ├── Tab 2: ActivityTrackerScreen   [Today's steps, weekly histogram, Strava leaderboard]
+│   ├── Tab 3: FoodScannerScreen       [Camera preview, photo capture, Gemini AI analysis modal]
+│   ├── Tab 4: WorkoutScreen           [Categorized home routine catalog, active timer player]
+│   └── Tab 5: CommunityScreen         [Social activity feed, high-fives, comment dialog]
+│
+└── Full-Screen Modals & Analyzers
+    ├── RecordActivityScreen      [GPS tracking HUD, live map view, pause/finish controls]
+    ├── LiveWalkingAnalyzerScreen [Screen-off Android foreground walking analyzer]
+    ├── ActivitySummaryScreen     [Post-walk review, elevation GAP chart, split times table]
+    ├── AchievementsScreen        [Trophy Room with Bronze-to-Diamond tiers & point counter]
+    └── ProfileEditScreen         [Edit biological metrics, update calorie & macro goals]
+    </pre>
+    <div class="diagram-caption">Figure 3.1: Complete Screen Navigation & Modal Presentation Tree.</div>
+  </div>
+
+  <h2>3.2 Floating Charcoal Pill Navigation Bar</h2>
+  <p>
+    Unlike conventional mobile bottom tabs that span edge-to-edge with rigid rectangular borders, AVFIT introduces a floating architectural pill dock:
+  </p>
+  <ul>
+    <li><strong>Visual Tokens:</strong> Background in Satin Charcoal (<code>#161A17</code>), 36px border radius, 64px container height, elevated with soft ambient drop-shadow (<code>elevation: 12</code>, <code>shadowOpacity: 0.25</code>).</li>
+    <li><strong>Interactive Feedback:</strong> When an active tab is selected, the icon is highlighted in Forest Green (<code>#244A32</code>) and framed inside a luminous white circular pill badge (<code>#FFFFFF</code>) with tactile feedback.</li>
+    <li><strong>Edge-to-Edge Safety:</strong> Dynamically calculates bottom offset using <code>useSafeAreaInsets()</code> to ensure floating positioning across iOS home bars and Android gesture navigation.</li>
+  </ul>
+
+  <!-- SECTION 4 -->
+  <h1>4. Phone Number OTP & Security Engine</h1>
+
+  <h2>4.1 SMS Authentication Architecture</h2>
+  <p>
+    Recognizing that mobile fitness logging requires minimal friction, AVFIT provides native <strong>Phone Number OTP Authentication</strong> alongside standard email login. The authentication workflow implements defense-in-depth security:
+  </p>
+
+  <div class="callout info">
+    <div class="callout-title">Security & Rate Limiting Guardrails</div>
+    1. <strong>60-Second Cooldown:</strong> Enforces an unskippable 60-second hardware countdown before any resend SMS request can be triggered, preventing SMS toll fraud.<br>
+    2. <strong>Regulatory Carrier Consent:</strong> Explicit notice displayed prior to OTP dispatch: <em>"By proceeding, you agree to receive SMS verification codes. Standard carrier rates may apply."</em><br>
+    3. <strong>Auto-Advancing Cells:</strong> Six discrete text inputs that detect single-digit input, advance cursor focus to the next cell immediately, and cleanly handle backspaces.<br>
+    4. <strong>Sandbox Test Bypass:</strong> Safe pre-configured developer test numbers (e.g. <code>+1 555-000-1111</code>) with static verification code <code>123456</code> for local and automated testing.
+  </div>
+
+  <h2>4.2 Supabase OTP Implementation Contract</h2>
+  <p>
+    The client communicates with Supabase Auth via <code>src/services/auth.ts</code>:
+  </p>
+  <pre><code>// 1. Dispatch OTP SMS Request
+export async function sendOtp(phone: string): Promise&lt;{ success: boolean; error?: string }&gt; {
+  const formattedPhone = phone.trim();
+  const { error } = await supabase.auth.signInWithOtp({
+    phone: formattedPhone,
+  });
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+// 2. Verify 6-Digit Code and Exchange for JWT Session
+export async function verifyOtp(
+  phone: string, 
+  token: string
+): Promise&lt;{ session: Session | null; isNewUser: boolean; error?: string }&gt; {
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone,
+    token,
+    type: 'sms',
+  });
+  if (error) return { session: null, isNewUser: false, error: error.message };
+  
+  // Query profile to determine if onboarding wizard is required
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_onboarded')
+    .eq('id', data.user?.id)
+    .single();
+
+  return { 
+    session: data.session, 
+    isNewUser: !profile || !profile.is_onboarded 
+  };
+}</code></pre>
+
+  <!-- SECTION 5 -->
+  <h1>5. Scientific Metabolic Profiling (Mifflin-St Jeor)</h1>
+
+  <h2>5.1 Clinical Formulation of Energy Expenditure</h2>
+  <p>
+    Rather than relying on arbitrary calorie estimates, AVFIT implements the clinically validated <strong>Mifflin-St Jeor Equation</strong>, recognized in nutritional science as the gold standard for predicting Basal Metabolic Rate (BMR) with the lowest margin of error (&plusmn;5%):
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">Mathematical Formulations</div>
+    <p><strong>For Males:</strong><br>
+    $$	ext{BMR} = (10 	imes 	ext{Weight}_{	ext{kg}}) + (6.25 	imes 	ext{Height}_{	ext{cm}}) - (5 	imes 	ext{Age}_{	ext{years}}) + 5$$</p>
+    <p><strong>For Females:</strong><br>
+    $$	ext{BMR} = (10 	imes 	ext{Weight}_{	ext{kg}}) + (6.25 	imes 	ext{Height}_{	ext{cm}}) - (5 	imes 	ext{Age}_{	ext{years}}) - 161$$</p>
+    <p><strong>For Non-Binary / Unspecified:</strong><br>
+    $$	ext{BMR} = (10 	imes 	ext{Weight}_{	ext{kg}}) + (6.25 	imes 	ext{Height}_{	ext{cm}}) - (5 	imes 	ext{Age}_{	ext{years}}) - 78$$</p>
+  </div>
+
+  <h2>5.2 Total Daily Energy Expenditure (TDEE) Multipliers</h2>
+  <p>
+    BMR reflects baseline organ metabolic maintenance at absolute rest. Total Daily Energy Expenditure (TDEE) incorporates occupational and structured athletic activity:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Activity Tier</th>
+        <th>Physical Activity Level (PAL)</th>
+        <th>Criteria & Lifestyle Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Sedentary</strong></td>
+        <td><code>1.200 &times; BMR</code></td>
+        <td>Desk-bound profession, minimal walking, zero structured training (&lt;3,000 steps/day).</td>
+      </tr>
+      <tr>
+        <td><strong>Lightly Active</strong></td>
+        <td><code>1.375 &times; BMR</code></td>
+        <td>Light daily walking or low-intensity exercise 1–3 days per week (4,000–7,000 steps/day).</td>
+      </tr>
+      <tr>
+        <td><strong>Moderately Active</strong></td>
+        <td><code>1.550 &times; BMR</code></td>
+        <td>Moderate training 3–5 days per week or physically active job (8,000–11,000 steps/day).</td>
+      </tr>
+      <tr>
+        <td><strong>Very Active</strong></td>
+        <td><code>1.725 &times; BMR</code></td>
+        <td>Heavy athletic training 6–7 days per week or endurance runner (12,000+ steps/day).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5.3 Caloric Goal Offsets & Macronutrient Allocation Algorithm</h2>
+  <p>
+    Once TDEE is determined, the algorithm establishes specific calorie targets and computes a clinically balanced macronutrient split:
+  </p>
+  <ul>
+    <li><strong>Weight Loss:</strong> $	ext{Target} = 	ext{TDEE} - 500	ext{ kcal}$ (sustainable ~0.5kg/week fat reduction). Enforces an absolute biological floor: $1,500	ext{ kcal}$ for males and $1,200	ext{ kcal}$ for females to prevent metabolic adaptation.</li>
+    <li><strong>Muscle Gain:</strong> $	ext{Target} = 	ext{TDEE} + 350	ext{ kcal}$ (hypertrophic surplus favoring lean tissue accretion over adiposity).</li>
+    <li><strong>Maintenance:</strong> $	ext{Target} = 	ext{TDEE}$.</li>
+    <li><strong>Protein Safeguard:</strong> Calibrated at $2.0	ext{g} 	imes 	ext{Weight}_{	ext{kg}}$ ($4	ext{ kcal/g}$), preserving lean muscle tissue during caloric restriction.</li>
+    <li><strong>Dietary Fats:</strong> Fixed at $25%$ of total daily calories ($9	ext{ kcal/g}$) to maintain essential endocrine hormonal production.</li>
+    <li><strong>Carbohydrates:</strong> Remainder of daily calories divided by $4	ext{ kcal/g}$.</li>
+    <li><strong>Hydration Benchmark:</strong> $35	ext{ ml} 	imes 	ext{Weight}_{	ext{kg}} + 500	ext{ ml}$ activity allowance.</li>
+  </ul>
+
+  <!-- SECTION 6 -->
+  <h1>6. Unified Health Dashboard & Daily Rings</h1>
+
+  <h2>6.1 Dashboard Visual Information Hierarchy</h2>
+  <p>
+    The AVFIT Dashboard (<code>src/screens/DashboardScreen.tsx</code>) operates as the user's primary command center. Designed to prevent cognitive overload, it organizes health telemetry into five intuitive zones:
+  </p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="num">8,420</div>
+      <div class="label">Daily Steps (84%)</div>
+    </div>
+    <div class="metric-card">
+      <div class="num">485 kcal</div>
+      <div class="label">Active Burn</div>
+    </div>
+    <div class="metric-card">
+      <div class="num">1,620</div>
+      <div class="label">Consumed kcal</div>
+    </div>
+    <div class="metric-card">
+      <div class="num">14 Days</div>
+      <div class="label">Movement Streak</div>
+    </div>
+  </div>
+
+  <h2>6.2 Core Dashboard Functional Modules</h2>
+  <ul>
+    <li><strong>Biometric Rings Widget:</strong> Visualizes step completion percentage, active caloric expenditure, and caloric intake versus budget in real-time.</li>
+    <li><strong>Dynamic Calorie Balance Card:</strong> Real-time display of $Remaining = Target - Consumed + Burned$, preventing unguided overconsumption.</li>
+    <li><strong>Macronutrient Progress Bars:</strong> Triple stacked progress meters for Protein, Carbohydrates, and Fats, dynamically updated as food entries are scanned.</li>
+    <li><strong>Water Hydration Logger:</strong> Interactive grid allowing one-tap logging of $250	ext{ ml}$ cups toward the calculated daily hydration target.</li>
+    <li><strong>Active Streak Preservation Engine:</strong> Tracks continuous days of app participation (step goal hit, meal logged, or workout completed). Protects streak integrity across timezone boundaries.</li>
+    <li><strong>Quick Action Floating Bar:</strong> Immediate one-tap access to "Record Walk (GPS)", "Scan Meal with AI", and "Start Home Workout".</li>
+  </ul>
+
+  <!-- SECTION 7 -->
+  <h1>7. Strava-Grade GPS Outdoor Walking Analyzer</h1>
+
+  <h2>7.1 Technical Architecture of Outdoor Tracking</h2>
+  <p>
+    Outdoor walking and running tracking in AVFIT is powered by a dedicated high-precision GPS telemetry engine (<code>src/modules/walking-analyzer/</code> and <code>src/screens/activity/RecordActivityScreen.tsx</code>). To achieve parity with dedicated athletic trackers like Strava, the engine implements four core capabilities:
+  </p>
+
+  <div class="pillar-grid">
+    <div class="pillar-card">
+      <h4>🛰️ Screen-Off Foreground Service</h4>
+      <p>Operates an Android Foreground Service with a persistent status bar notification, preventing the OS power manager from sleeping GPS antennas when the phone is locked in the user's pocket.</p>
+    </div>
+    <div class="pillar-card">
+      <h4>📐 Haversine Geodesic Distance</h4>
+      <p>Computes exact surface distance between sequential breadcrumb coordinates across Earth's curvature, compensating for spherical geodesics.</p>
+    </div>
+    <div class="pillar-card">
+      <h4>🎯 Kalman Noise Filter & Accuracy Gates</h4>
+      <p>Automatically discards spurious GPS readings where horizontal accuracy exceeds 25 meters or calculated instantaneous speed exceeds 30 km/h (teleportation rejection).</p>
+    </div>
+    <div class="pillar-card">
+      <h4>📈 Grade Adjusted Pace (GAP) & Splits</h4>
+      <p>Automatically segments walks into 1,000-meter splits with elevation gain/loss calculations, computing Grade Adjusted Pace (GAP) for hilly terrain.</p>
+    </div>
+  </div>
+
+  <h2>7.2 Geodesic Formulation (Haversine Algorithm)</h2>
+  <p>
+    Given sequential coordinates $P_1(phi_1, lambda_1)$ and $P_2(phi_2, lambda_2)$ where $phi$ represents latitude and $lambda$ represents longitude in radians:
+  </p>
+  <pre><code>// Haversine Formulation in TypeScript (src/modules/walking-analyzer/services/HaversineCalculator.ts)
+export function calculateHaversineDistance(
+  lat1: number, lon1: number, 
+  lat2: number, lon2: number
+): number {
+  const R = 6371000; // Earth mean radius in meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in meters
+}</code></pre>
+
+  <h2>7.3 Kilometer Splits Table & Route Map Visualizer</h2>
+  <p>
+    The post-activity summary screen (<code>ActivitySummaryScreen.tsx</code>) automatically constructs an interactive SVG trail path plotting each breadcrumb coordinate, alongside a granular Kilometer Splits Table:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Split KM</th>
+        <th>Split Time</th>
+        <th>Avg Pace</th>
+        <th>Elev Delta</th>
+        <th>GAP (Grade Adjusted Pace)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>KM 1</strong></td>
+        <td>9m 42s</td>
+        <td>9'42" /km</td>
+        <td>+12 m</td>
+        <td>9'28" /km</td>
+      </tr>
+      <tr>
+        <td><strong>KM 2</strong></td>
+        <td>9m 15s</td>
+        <td>9'15" /km</td>
+        <td>-4 m</td>
+        <td>9'18" /km</td>
+      </tr>
+      <tr>
+        <td><strong>KM 3</strong></td>
+        <td>8m 58s</td>
+        <td>8'58" /km</td>
+        <td>+22 m</td>
+        <td>8'34" /km</td>
+      </tr>
+      <tr>
+        <td><strong>KM 4</strong></td>
+        <td>9m 30s</td>
+        <td>9'30" /km</td>
+        <td>+2 m</td>
+        <td>9'29" /km</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 8 -->
+  <h1>8. Google Gemini 1.5 Flash Food Vision Pipeline</h1>
+
+  <h2>8.1 Multimodal Food Scanning Workflow</h2>
+  <p>
+    Logging nutrition has historically been the primary point of user churn across fitness apps. AVFIT circumvents tedious manual ingredient entry by pairing native camera hardware capture (<code>expo-camera</code> / <code>expo-image-picker</code>) with <strong>Google Gemini 1.5 Flash Vision API</strong>.
+  </p>
+
+  <div class="diagram-box">
+    <svg width="600" height="100" viewBox="0 0 600 100" fill="none" style="max-width: 100%;">
+      <rect x="10" y="25" width="100" height="50" rx="6" fill="#F0F6F2" stroke="#244A32" />
+      <text x="60" y="47" font-size="8.5" font-weight="700" fill="#244A32" text-anchor="middle">1. Camera Snap</text>
+      <text x="60" y="60" font-size="7.5" fill="#4A524D" text-anchor="middle">Base64 JPEG</text>
+
+      <path d="M 110 50 L 140 50" stroke="#244A32" stroke-width="2" marker-end="url(#arrow)" />
+
+      <rect x="140" y="25" width="130" height="50" rx="6" fill="#FFFBEB" stroke="#D97706" />
+      <text x="205" y="47" font-size="8.5" font-weight="700" fill="#B45309" text-anchor="middle">2. Gemini Flash</text>
+      <text x="205" y="60" font-size="7.5" fill="#92400E" text-anchor="middle">Structured JSON Schema</text>
+
+      <path d="M 270 50 L 300 50" stroke="#244A32" stroke-width="2" marker-end="url(#arrow)" />
+
+      <rect x="300" y="25" width="140" height="50" rx="6" fill="#F0F9FF" stroke="#0284C7" />
+      <text x="370" y="47" font-size="8.5" font-weight="700" fill="#0369A1" text-anchor="middle">3. Portion Review</text>
+      <text x="370" y="60" font-size="7.5" fill="#0284C7" text-anchor="middle">User Slider Correction</text>
+
+      <path d="M 440 50 L 470 50" stroke="#244A32" stroke-width="2" marker-end="url(#arrow)" />
+
+      <rect x="470" y="25" width="120" height="50" rx="6" fill="#F0F6F2" stroke="#244A32" />
+      <text x="530" y="47" font-size="8.5" font-weight="700" fill="#244A32" text-anchor="middle">4. Supabase DB</text>
+      <text x="530" y="60" font-size="7.5" fill="#4A524D" text-anchor="middle">Daily Log & Streak</text>
+    </svg>
+    <div class="diagram-caption">Figure 8.1: Sub-3-Second AI Vision Nutrition Parsing Pipeline.</div>
+  </div>
+
+  <h2>8.2 Structured Prompt & JSON Schema Contract</h2>
+  <p>
+    The Gemini request enforces rigid JSON typing to ensure predictable, error-free parsing on the React Native client:
+  </p>
+  <pre><code>// System Prompt Template for Gemini 1.5 Flash (src/services/geminiVision.ts)
+export const GEMINI_NUTRITION_PROMPT = `
+Analyze the provided food photograph as a clinical sports nutritionist.
+Output ONLY a valid JSON object strictly matching this schema:
+{
+  "dish_name": "string (concise recognizable title)",
+  "confidence": "high" | "medium" | "low",
+  "estimated_weight_grams": number,
+  "calories": number,
+  "protein_grams": number,
+  "carbs_grams": number,
+  "fat_grams": number,
+  "fiber_grams": number,
+  "ingredients": [
+    { "name": "string", "weight_g": number, "calories": number }
+  ],
+  "health_insights": "string (1-2 sentences on nutritional balance)"
+}
+Do not enclose in markdown code blocks. Provide raw JSON text only.`;</code></pre>
+
+  <!-- SECTION 9 -->
+  <h1>9. Interactive Home Workouts & Smart Timers</h1>
+
+  <h2>9.1 Curated Bodyweight & Minimal Equipment Catalog</h2>
+  <p>
+    The AVFIT Workout Engine (<code>src/screens/WorkoutScreen.tsx</code>) delivers a structured library of home routines that require no gym membership:
+  </p>
+  <ul>
+    <li><strong>Full Body HIIT Circuit:</strong> 20 minutes, high metabolic burn (~280 kcal), bodyweight plyometrics and core stability.</li>
+    <li><strong>Core Crusher & Abs Tone:</strong> 15 minutes, targeted abdominal endurance, plank progressions, and hollow-body holds.</li>
+    <li><strong>Upper Body Push & Form:</strong> 25 minutes, standard push-up variations, pike push-ups, and tricep bench dips.</li>
+    <li><strong>Lower Body Tone & Glutes:</strong> 20 minutes, bodyweight squats, walking lunges, calf raises, and wall sits.</li>
+    <li><strong>Mobility, Joint Health & Stretch:</strong> 12 minutes, hamstring releases, thoracic openers, and hip mobility flow.</li>
+  </ul>
+
+  <h2>9.2 Active Exercise Player & Smart Rest Timers</h2>
+  <p>
+    Each workout is conducted through an interactive player featuring:
+  </p>
+  <ul>
+    <li><strong>Dynamic Rep Counters:</strong> One-tap rep incrementation with tactile haptic feedback (<code>expo-haptics</code>).</li>
+    <li><strong>Automated Rest Countdown:</strong> Interval rest timers (30s, 45s, 60s) with audio cues and countdown animations.</li>
+    <li><strong>Volume & Calorie Aggregation:</strong> Computes cumulative mechanical volume and caloric burn based on user weight and time under tension.</li>
+  </ul>
+
+  <!-- SECTION 10 -->
+  <h1>10. Gamified 25-Trophy Engine & Anti-Cheat Logic</h1>
+
+  <h2>10.1 Five-Tier Trophy Hierarchy</h2>
+  <p>
+    To foster sustained physical activity, AVFIT features an extensive gamified Trophy Room (<code>src/screens/achievements/AchievementsScreen.tsx</code>). Trophies are organized into five escalating tiers:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Hex Theme</th>
+        <th>Point Value</th>
+        <th>Gamification Objective & Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Bronze</strong></td>
+        <td><code>#CD7F32</code></td>
+        <td>25 – 75 pts</td>
+        <td>Onboarding milestones, first step logs, initial meal scans, and introductory workouts.</td>
+      </tr>
+      <tr>
+        <td><strong>Silver</strong></td>
+        <td><code>#94A3B8</code></td>
+        <td>100 – 200 pts</td>
+        <td>Consistency builders: 7-day movement streaks, 10,000 steps in a day, 25 workouts.</td>
+      </tr>
+      <tr>
+        <td><strong>Gold</strong></td>
+        <td><code>#EAB308</code></td>
+        <td>300 – 450 pts</td>
+        <td>Substantial athletic dedication: 30-day unstoppable streak, 50km foot distance.</td>
+      </tr>
+      <tr>
+        <td><strong>Platinum</strong></td>
+        <td><code>#0284C7</code></td>
+        <td>500 – 600 pts</td>
+        <td>Elite mastery: 100 logged workouts, reaching target goal weight, 100km club.</td>
+      </tr>
+      <tr>
+        <td><strong>Diamond</strong></td>
+        <td><code>#BE185D</code></td>
+        <td>1,000 pts</td>
+        <td>Apex status: 1,000 community points and comprehensive wellness mastery.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>10.2 Complete 25-Achievement Catalog</h2>
+  <div class="callout">
+    <div class="callout-title">Full Achievement Manifest</div>
+    <ul style="margin-bottom: 0;">
+      <li><strong>Step & Activity:</strong> <code>STEPS_FIRST_1K</code> (Bronze), <code>STEPS_5K</code> (Bronze), <code>STEPS_10K</code> (Silver), <code>STREAK_7</code> (Silver), <code>STREAK_30</code> (Gold), <code>DISTANCE_50KM</code> (Gold).</li>
+      <li><strong>Workout Routines:</strong> <code>WORKOUT_FIRST</code> (Bronze), <code>WORKOUT_5</code> (Bronze), <code>WORKOUT_25</code> (Silver), <code>WORKOUT_WEEKLY</code> (Silver), <code>WORKOUT_MONTHLY</code> (Gold), <code>WORKOUT_100</code> (Platinum).</li>
+      <li><strong>AI Food & Nutrition:</strong> <code>NUTRITION_FIRST_LOG</code> (Bronze), <code>NUTRITION_7_DAYS</code> (Silver), <code>NUTRITION_MACRO_HIT</code> (Silver), <code>NUTRITION_30_DAYS</code> (Gold).</li>
+      <li><strong>Community & Social:</strong> <code>COMMUNITY_FIRST_POST</code> (Bronze), <code>COMMUNITY_JOIN_CHALL</code> (Bronze), <code>COMMUNITY_MOTIVATOR</code> (Silver), <code>COMMUNITY_COMPLETE</code> (Gold).</li>
+      <li><strong>Personal Progress & Apex:</strong> <code>PROGRESS_UPDATE</code> (Bronze), <code>PROGRESS_GOAL</code> (Platinum), <code>PROGRESS_DIAMOND</code> (Diamond).</li>
+    </ul>
+  </div>
+
+  <h2>10.3 Server-Side Anti-Cheat Triggers & Idempotency</h2>
+  <p>
+    Trophies in AVFIT cannot be unlocked through client-side API manipulation. PostgreSQL stored procedures (<code>evaluate_user_milestones()</code>) evaluate database mutations upon activity or workout completion:
+  </p>
+  <ul>
+    <li><strong>Idempotent Unlocking:</strong> Verifies <code>is_unlocked = FALSE</code> prior to timestamp insertion, preventing duplicate point attribution.</li>
+    <li><strong>Human Plausibility Thresholds:</strong> Verifies that logged workout duration does not exceed 180 continuous minutes and step cadence does not violate human biomechanical limits.</li>
+  </ul>
+
+  <!-- SECTION 11 -->
+  <h1>11. Social Community & Leaderboard Ecosystem</h1>
+
+  <h2>11.1 Community Feed Architecture</h2>
+  <p>
+    The AVFIT Community tab (<code>src/screens/CommunityScreen.tsx</code>) promotes accountability through social proof:
+  </p>
+  <ul>
+    <li><strong>Rich Feed Post Types:</strong> Displays workout summaries (duration, calories), AI meal logs (with dish photo and macro chips), and step milestones.</li>
+    <li><strong>Social Interactions:</strong> High-fives (likes with dynamic vibration feedback), threaded comments, and user profile inspection.</li>
+    <li><strong>Privacy Settings:</strong> Three privacy levels per post: Public (Community Feed), Friends Only, or Private (Only Me).</li>
+  </ul>
+
+  <h2>11.2 Strava-Style Leaderboards</h2>
+  <p>
+    A competitive weekly and monthly step leaderboard ranks users within friend groups and community leagues:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Weekly Steps</th>
+        <th>Daily Average</th>
+        <th>Badge Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🥇 1</td>
+        <td>Alex R.</td>
+        <td>78,450</td>
+        <td>11,207</td>
+        <td><span class="badge badge-gold">Gold Pace</span></td>
+      </tr>
+      <tr>
+        <td>🥈 2</td>
+        <td>Priya S.</td>
+        <td>71,200</td>
+        <td>10,171</td>
+        <td><span class="badge badge-cyan">Silver Pace</span></td>
+      </tr>
+      <tr>
+        <td>🥉 3</td>
+        <td>David M.</td>
+        <td>64,190</td>
+        <td>9,170</td>
+        <td><span class="badge badge-green">Bronze Pace</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 12 -->
+  <h1>12. Production PostgreSQL Database Schema & RLS</h1>
+
+  <h2>12.1 Entity Relationship Diagram</h2>
+  <p>
+    The complete backend schema is hosted on Supabase PostgreSQL (<code>docs/DATABASE_SCHEMA.sql</code>), featuring 12 relational tables governed by strict <strong>Row-Level Security (RLS)</strong>:
+  </p>
+
+  <div class="diagram-box">
+    <pre>
+[auth.users] (Supabase Auth Core)
+     │
+     ├── 1:1 ── [public.profiles] (phone, name, avatar, streak, trophy_points)
+     │                │
+     │                ├── 1:1 ── [public.fitness_profiles] (BMR, TDEE, macros)
+     │                ├── 1:N ── [public.activities] (GPS outdoor sessions)
+     │                │                ├── 1:N ── [public.gps_breadcrumbs]
+     │                │                └── 1:N ── [public.split_times]
+     │                ├── 1:N ── [public.meals] (AI scanned food logs)
+     │                ├── 1:N ── [public.workouts] (completed routines)
+     │                ├── 1:N ── [public.user_achievements] ── N:1 ── [public.achievements]
+     │                ├── 1:1 ── [public.user_streaks]
+     │                └── 1:N ── [public.posts] (Community feed)
+     │                                 ├── 1:N ── [public.post_reactions]
+     │                                 └── 1:N ── [public.post_comments]
+    </pre>
+    <div class="diagram-caption">Figure 12.1: Relational Database Entity Schema Topology.</div>
+  </div>
+
+  <h2>12.2 Table Definitions & Data Dictionary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Primary Key</th>
+        <th>Key Foreign References</th>
+        <th>Description & Row-Level Security Policy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>profiles</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>auth.users(id)</code></td>
+        <td>User identity, phone, streak counter, total trophy points. Public read, self-update only.</td>
+      </tr>
+      <tr>
+        <td><code>fitness_profiles</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code></td>
+        <td>Confidential biological health data: BMR, TDEE, macros, target weight. Strictly private (self-only).</td>
+      </tr>
+      <tr>
+        <td><code>activities</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code></td>
+        <td>GPS walk/run records (duration, distance, calories, GAP pace). Self read/write.</td>
+      </tr>
+      <tr>
+        <td><code>gps_breadcrumbs</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>activities(id)</code></td>
+        <td>High-resolution GPS telemetry stream (lat, lon, altitude, speed). Self read/write.</td>
+      </tr>
+      <tr>
+        <td><code>split_times</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>activities(id)</code></td>
+        <td>1,000m split metrics, elevation delta, split duration. Self read/write.</td>
+      </tr>
+      <tr>
+        <td><code>meals</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code></td>
+        <td>AI food scan entries, macronutrient values, food photo URLs. Self read/write.</td>
+      </tr>
+      <tr>
+        <td><code>workouts</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code></td>
+        <td>Home routine logs, exercise lists, reps, calories. Self read/write.</td>
+      </tr>
+      <tr>
+        <td><code>achievements</code></td>
+        <td><code>id (UUID)</code></td>
+        <td>None (Catalog)</td>
+        <td>25 master trophy definitions (tier, category, points, requirements). Public read-only.</td>
+      </tr>
+      <tr>
+        <td><code>user_achievements</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code>, <code>achievements(id)</code></td>
+        <td>Unlocked trophies with verification timestamps. Public read, trigger-written.</td>
+      </tr>
+      <tr>
+        <td><code>posts</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>profiles(id)</code></td>
+        <td>Social community updates. Public read, author update/delete.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 13 -->
+  <h1>13. UI/UX Editorial Design Tokens & Brand Kit</h1>
+
+  <h2>13.1 Editorial Color Philosophy</h2>
+  <p>
+    Unlike conventional neon-and-black athletic interfaces, AVFIT implements an <strong>Organic Editorial Design Language</strong> inspired by natural botanical harmony:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Token Name</th>
+        <th>Color Value</th>
+        <th>Role & Application in AVFIT Interface</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Colors.background</code></td>
+        <td><code>#F9F6F0</code> (Warm Cream)</td>
+        <td>Primary screen canvas, offering warm organic visual comfort.</td>
+      </tr>
+      <tr>
+        <td><code>Colors.surface</code></td>
+        <td><code>#FFFFFF</code> (Crisp White)</td>
+        <td>Primary elevated cards, dashboard widgets, and input panels.</td>
+      </tr>
+      <tr>
+        <td><code>Colors.primary</code></td>
+        <td><code>#244A32</code> (Deep Forest Green)</td>
+        <td>Brand anchor, primary call-to-action buttons, active toggles.</td>
+      </tr>
+      <tr>
+        <td><code>Colors.accent</code></td>
+        <td><code>#E07A5F</code> (Terracotta Flame)</td>
+        <td>Energetic accents, active workout streaks, high-five icons.</td>
+      </tr>
+      <tr>
+        <td><code>Colors.navbarBackground</code></td>
+        <td><code>#161A17</code> (Satin Charcoal)</td>
+        <td>Floating bottom pill dock and high-contrast night surfaces.</td>
+      </tr>
+      <tr>
+        <td><code>Colors.textPrimary</code></td>
+        <td><code>#191C1A</code> (Deep Charcoal)</td>
+        <td>High-contrast editorial typography ensuring optimal readability.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 14 -->
+  <h1>14. Build Engineering, EAS Deployment & Roadmap</h1>
+
+  <h2>14.1 Production EAS Build Configuration (eas.json)</h2>
+  <p>
+    AVFIT is configured for automated cloud builds via Expo Application Services (EAS):
+  </p>
+  <pre><code>// eas.json Build Configuration
+{
+  "cli": {
+    "version": ">= 9.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  }
+}</code></pre>
+
+  <h2>14.2 Standalone Android APK Release</h2>
+  <p>
+    The project repository includes a standalone production Android build:
+  </p>
+  <ul>
+    <li><strong>Artifact:</strong> <code>AVFIT.apk</code> (88 MB optimized standalone release).</li>
+    <li><strong>Target SDK:</strong> Android 14 (API Level 34) with backwards compatibility to Android 8.0 (API Level 26).</li>
+    <li><strong>Hardware Permissions:</strong> <code>ACCESS_FINE_LOCATION</code>, <code>ACCESS_BACKGROUND_LOCATION</code>, <code>FOREGROUND_SERVICE_LOCATION</code>, <code>ACTIVITY_RECOGNITION</code>, <code>CAMERA</code>.</li>
+  </ul>
+
+  <h2>14.3 Strategic Roadmap & Future Milestones</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Timeline</th>
+        <th>Target Features & Capabilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Phase 1 (Current)</strong></td>
+        <td>Q4 2026</td>
+        <td>Dual Phone OTP Auth, Mifflin-St Jeor Engine, Gemini 1.5 Flash Food Vision, GPS Walking Analyzer, 25-Trophy System, Supabase RLS.</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 2</strong></td>
+        <td>Q1 2027</td>
+        <td>Apple HealthKit & Google Health Connect bidirectional continuous sync; BLE heart rate chest strap integration.</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 3</strong></td>
+        <td>Q2 2027</td>
+        <td>On-device real-time exercise pose estimation using TensorFlow Lite for automatic squat/pushup rep counting and posture feedback.</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 4</strong></td>
+        <td>Q3 2027</td>
+        <td>Audio-guided running coach powered by real-time voice synthesis advising pace adjustments during outdoor training runs.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-stamp">
+    <strong>AVFIT Engineering Specification</strong> • Published October 2026 • Vyalwin Technologies • All Rights Reserved.
+  </div>
+
+</body>
+</html>
