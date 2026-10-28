@@ -8,6 +8,16 @@ import { GPSPoint } from '../types';
 export type TrackingStatus = 'idle' | 'initializing' | 'ready' | 'recording' | 'paused' | 'stopped' | 'error';
 export type PermissionState = 'undetermined' | 'granted' | 'denied' | 'permanently_denied' | 'disabled';
 
+const LIVE_PACE_WINDOW_MS = 30_000;
+const LIVE_PACE_MIN_DURATION_MS = 10_000;
+const LIVE_PACE_MIN_DISTANCE_METERS = 12;
+const LIVE_PACE_STALE_MS = 15_000;
+
+interface PaceSample {
+  timestamp: number;
+  cumulativeDistanceMeters: number;
+}
+
 export interface LocationTrackerState {
   status: TrackingStatus;
   permissionState: PermissionState;
@@ -34,9 +44,11 @@ export function haversineDistanceMeters(lat1: number, lon1: number, lat2: number
 
 export function formatPace(secondsPerKm: number): string {
   if (!secondsPerKm || !isFinite(secondsPerKm) || secondsPerKm <= 0 || secondsPerKm > 3600) return '--:-- /km';
-  const mins = Math.floor(secondsPerKm / 60);
-  const secs = Math.round(secondsPerKm % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs} /km`;
+  const roundedSeconds = Math.round(secondsPerKm);
+  if (roundedSeconds > 3600) return '--:-- /km';
+  const mins = Math.floor(roundedSeconds / 60);
+  const secs = roundedSeconds % 60;
+  return `${mins}:${String(secs).padStart(2, '0')} /km`;
 }
 
 export function formatDuration(totalSeconds: number): string {
@@ -70,6 +82,7 @@ export function useLocationTracker() {
   const pedometerSubscription = useRef<{ remove: () => void } | null>(null);
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastAcceptedPoint = useRef<GPSPoint | null>(null);
+  const paceSamples = useRef<PaceSample[]>([]);
   const isTrackingActive = useRef(false);
   const isPausedRef = useRef(false);
   const activeSecondsRef = useRef(0);
@@ -163,13 +176,35 @@ export function useLocationTracker() {
       const meters = haversineDistanceMeters(previous.latitude, previous.longitude, latitude, longitude);
       const speedMps = meters / seconds;
       if (speedMps > 12) return;
-      if (meters < 2 && (speed == null || speed < 0.5)) return;
+      // Ignore sub-three-meter position jitter unless the device's own GPS speed
+      // confirms movement. This reduces false distance and pace while standing still.
+      if (meters < 3 && (speed == null || speed < 0.7)) return;
       distanceMetersRef.current += meters;
       setTotalDistanceKm(distanceMetersRef.current / 1000);
-      setLivePace(formatPace(seconds / (meters / 1000)));
     }
     lastAcceptedPoint.current = point;
     setRouteCoordinates((points) => [...points, point]);
+
+    const latestSample = paceSamples.current[paceSamples.current.length - 1];
+    if (latestSample && timestamp - latestSample.timestamp > LIVE_PACE_STALE_MS) {
+      // Start a fresh pace window after a GPS outage or a long gap between fixes.
+      paceSamples.current = [];
+    }
+    paceSamples.current.push({
+      timestamp,
+      cumulativeDistanceMeters: distanceMetersRef.current,
+    });
+
+    const windowStart = timestamp - LIVE_PACE_WINDOW_MS;
+    while (paceSamples.current.length > 2 && paceSamples.current[1].timestamp < windowStart) {
+      paceSamples.current.shift();
+    }
+    const firstSample = paceSamples.current[0];
+    const elapsedMs = timestamp - firstSample.timestamp;
+    const traveledMeters = distanceMetersRef.current - firstSample.cumulativeDistanceMeters;
+    if (elapsedMs >= LIVE_PACE_MIN_DURATION_MS && traveledMeters >= LIVE_PACE_MIN_DISTANCE_METERS) {
+      setLivePace(formatPace((elapsedMs / 1000) / (traveledMeters / 1000)));
+    }
   }, []);
 
   useEffect(() => {
@@ -221,14 +256,18 @@ export function useLocationTracker() {
     setWorkoutSteps(0);
     setPauseEvents([]);
     setRouteCoordinates([]);
+    paceSamples.current = [];
     distanceMetersRef.current = 0;
     setTotalDistanceKm(0);
     activeSecondsRef.current = 0;
     setActiveDurationSec(0);
+    setLivePace('--:-- /km');
+    setAvgPace('--:-- /km');
     const seed = currentLocation;
-    if (seed && (seed.accuracy == null || seed.accuracy <= 25)) {
+    if (seed && (seed.accuracy == null || seed.accuracy <= 25) && Date.now() - seed.timestamp <= LIVE_PACE_STALE_MS) {
       setRouteCoordinates([seed]);
       lastAcceptedPoint.current = seed;
+      paceSamples.current.push({ timestamp: seed.timestamp, cumulativeDistanceMeters: 0 });
     } else {
       lastAcceptedPoint.current = null;
     }
@@ -262,6 +301,10 @@ export function useLocationTracker() {
         const elapsed = activeSecondsRef.current + Math.floor((Date.now() - startedAtRef.current) / 1000);
         setActiveDurationSec(elapsed);
         if (distanceMetersRef.current > 20) setAvgPace(formatPace(elapsed / (distanceMetersRef.current / 1000)));
+        if (lastAcceptedPoint.current && Date.now() - lastAcceptedPoint.current.timestamp > LIVE_PACE_STALE_MS) {
+          setLivePace('--:-- /km');
+          paceSamples.current = [];
+        }
       }
     }, 1000);
   }, [permissionState, requestPermissions, currentLocation, startLocationWatch, stopSubscriptions]);
@@ -276,6 +319,8 @@ export function useLocationTracker() {
     stopSubscriptions();
     void BackgroundWorkoutLocation.setPaused(true).catch(() => undefined);
     lastAcceptedPoint.current = null;
+    paceSamples.current = [];
+    setLivePace('--:-- /km');
     setStatus('paused');
   }, [stopSubscriptions, workoutSteps]);
 
@@ -328,6 +373,7 @@ export function useLocationTracker() {
     activeSecondsRef.current = 0;
     sessionStartTimestamp.current = null;
     lastAcceptedPoint.current = null;
+    paceSamples.current = [];
     setStatus('ready');
   }, [stopTracking]);
 
